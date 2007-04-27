@@ -44,10 +44,25 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("BÂ
 <td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/rails2u/debug/class-list.html');" href="com/rails2u/debug/Benchmark.html">Benchmark</a> &mdash; Class in package <a onclick="javascript:loadClassListFrame('com/rails2u/debug/class-list.html');" href="com/rails2u/debug/package-detail.html">com.rails2u.debug</a></td>
 </tr>
 <tr>
-<td width="20"></td><td></td>
+<td width="20"></td><td>
+    Simple Benchmark class
+    
+  example:
+  <div class='listing'><pre>
+  Benchmark.start('check');
+  // code
+  Benchmark.end('check');
+  </pre></div>
+  
+  <div class='listing'><pre>
+  Benchmark.benchmark('check2', function() {
+    // code
+  }, this);
+  </pre></div>
+    </td>
 </tr>
 <tr>
-<td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/rails2u/utils/class-list.html');" href="com/rails2u/utils/KeyTypeListener.html#bindKeyDown()">bindKeyDown</a>(useCapture, priority, useWeakReference) &mdash; Method in class com.rails2u.utils.<a onclick="javascript:loadClassListFrame('com/rails2u/utils/class-list.html');" href="com/rails2u/utils/KeyTypeListener.html">KeyTypeListener</a></td>
+<td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/rails2u/utils/class-list.html');" href="com/rails2u/utils/KeyTypeListener.html#bindKey()">bindKey</a>(type) &mdash; Method in class com.rails2u.utils.<a onclick="javascript:loadClassListFrame('com/rails2u/utils/class-list.html');" href="com/rails2u/utils/KeyTypeListener.html">KeyTypeListener</a></td>
 </tr>
 <tr>
 <td width="20"></td><td></td>

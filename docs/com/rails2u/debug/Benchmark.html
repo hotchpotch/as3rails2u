@@ -37,12 +37,23 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <tr>
 <td class="classHeaderTableLabel">Class</td><td class="classSignature">public class Benchmark</td>
 </tr>
-<tr>
-<td class="classHeaderTableLabel">Inheritance</td><td class="inheritanceList">Benchmark <img class="inheritArrow" alt="Inheritance" title="Inheritance" src="../../../images/inherit-arrow.gif"> flash.events.EventDispatcher</td>
-</tr>
 </table>
 <p></p>
-<p></p>
+    Simple Benchmark class
+    
+  example:
+  <div class='listing'><pre>
+  Benchmark.start('check');
+  // code
+  Benchmark.end('check');
+  </pre></div>
+  
+  <div class='listing'><pre>
+  Benchmark.benchmark('check2', function() {
+    // code
+  }, this);
+  </pre></div>
+    <p></p>
 <br>
 <hr>
 </div>

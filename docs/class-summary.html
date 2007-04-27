@@ -39,7 +39,22 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Al
 <tr class="prow1">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="com/rails2u/debug/Benchmark.html">Benchmark</a>
 <br>
-</td><td class="summaryTableCol"><a onclick="javascript:loadClassListFrame('com/rails2u/debug/class-list.html');" href="com/rails2u/debug/package-detail.html">com.rails2u.debug</a></td><td class="summaryTableLastCol">&nbsp;</td>
+</td><td class="summaryTableCol"><a onclick="javascript:loadClassListFrame('com/rails2u/debug/class-list.html');" href="com/rails2u/debug/package-detail.html">com.rails2u.debug</a></td><td class="summaryTableLastCol">
+    Simple Benchmark class
+    
+  example:
+  <listing version="3.0">
+  Benchmark.start('check');
+  // code
+  Benchmark.end('check');
+  </listing>
+  
+  <listing version="3.0">
+  Benchmark.benchmark('check2', function() {
+    // code
+  }, this);
+  </listing>
+    </td>
 </tr>
 <tr class="prow0">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="com/rails2u/utils/ColorUtil.html">ColorUtil</a>
@@ -49,7 +64,8 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Al
 <tr class="prow1">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="com/rails2u/utils/KeyTypeListener.html">KeyTypeListener</a>
 <br>
-</td><td class="summaryTableCol"><a onclick="javascript:loadClassListFrame('com/rails2u/utils/class-list.html');" href="com/rails2u/utils/package-detail.html">com.rails2u.utils</a></td><td class="summaryTableLastCol">&nbsp;</td>
+</td><td class="summaryTableCol"><a onclick="javascript:loadClassListFrame('com/rails2u/utils/class-list.html');" href="com/rails2u/utils/package-detail.html">com.rails2u.utils</a></td><td class="summaryTableLastCol">
+    KeyTypeListener attach keytype events(KEY_DOWN, KEY_UP) utility.</td>
 </tr>
 <tr class="prow0">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="com/rails2u/utils/ObjectInspecter.html">ObjectInspecter</a>
@@ -59,7 +75,10 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Al
 <tr class="prow1">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="com/rails2u/debug/PerformanceViewer.html">PerformanceViewer</a>
 <br>
-</td><td class="summaryTableCol"><a onclick="javascript:loadClassListFrame('com/rails2u/debug/class-list.html');" href="com/rails2u/debug/package-detail.html">com.rails2u.debug</a></td><td class="summaryTableLastCol">&nbsp;</td>
+</td><td class="summaryTableCol"><a onclick="javascript:loadClassListFrame('com/rails2u/debug/class-list.html');" href="com/rails2u/debug/package-detail.html">com.rails2u.debug</a></td><td class="summaryTableLastCol">
+    PerformanceViewer
+    
+    PerformanceViewer show FPS, used memory size.</td>
 </tr>
 </table>
 <p></p>

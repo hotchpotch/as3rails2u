@@ -1,10 +1,25 @@
 package com.rails2u.debug {
     import flash.utils.Dictionary;
-    import flash.events.EventDispatcher;
     import flash.events.Event;
     import flash.utils.getTimer;
 
-    public class Benchmark extends EventDispatcher {
+    /**
+    * Simple Benchmark class
+    * 
+  * example:
+  * <listing version="3.0">
+  * Benchmark.start('check');
+  * // code
+  * Benchmark.end('check');
+  * </listing>
+  * 
+  * <listing version="3.0">
+  * Benchmark.benchmark('check2', function() {
+  *   // code
+  * }, this);
+  * </listing>
+    */
+    public class Benchmark {
         private static var dict:Object = {};
 
         public static function start(name:String):void {

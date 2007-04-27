@@ -9,6 +9,13 @@ package com.rails2u.utils
     use namespace key_down;
     use namespace key_up;
     
+    /**
+    * KeyTypeListener attach keytype events(KEY_DOWN, KEY_UP) utility.
+    * 
+    * How to use:
+    *   please see examples dir.
+    */
+    
     public class KeyTypeListener
     {
         private static var objects:Dictionary = new Dictionary;
@@ -127,13 +134,13 @@ package com.rails2u.utils
         private const METHOD_NOT_CALLABLE:uint = 10;
         
         private function callableType(methodName:String, ns:Namespace):uint {
-            if (isDynamic)
-                return callableTypeImpl(methodName, ns);
+            if (isDynamic) return callableTypeImpl(methodName, ns);
 	            
-            if (callableCache[methodName] == null) {
-                callableCache[methodName] = callableTypeImpl(methodName, ns);
+	        callableCache[ns.uri] ||= {}; 
+            if (callableCache[ns.uri][methodName] == null) {
+                callableCache[ns.uri][methodName] = callableTypeImpl(methodName, ns);
             }
-            return callableCache[methodName];
+            return callableCache[ns.uri][methodName];
         }
         
         private function callableTypeImpl(methodName:String, ns:Namespace):uint {

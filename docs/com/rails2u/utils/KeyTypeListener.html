@@ -4,7 +4,7 @@
 <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../../style.css" type="text/css" media="screen">
 <link rel="stylesheet" href="../../../print.css" type="text/css" media="print">
-<meta content="KeyTypeListener,com.rails2u.utils.KeyTypeListener,obj,currentTarget,keyboardConstTable,attach,bindKeyDown,getMethodName,keyboardConstfromCharCode" name="keywords">
+<meta content="KeyTypeListener,com.rails2u.utils.KeyTypeListener,obj,currentTarget,keyboardConstTable,attach,detach,bindKey,destroy,destroyImpl,keyDownHandler,keyUpHandler,keyHandlerDelegeter,getMethodName,keyboardConstfromCharCode" name="keywords">
 <title>com.rails2u.utils.KeyTypeListener</title>
 </head>
 <body>
@@ -39,7 +39,11 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 </tr>
 </table>
 <p></p>
-<p></p>
+    KeyTypeListener attach keytype events(KEY_DOWN, KEY_UP) utility.
+    
+    How to use:
+      please see examples dir.
+    <p></p>
 <br>
 <hr>
 </div>
@@ -83,7 +87,7 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <tr class="">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
 <div class="summarySignature">
-<a class="signatureLink" href="#KeyTypeListener()">KeyTypeListener</a>(obj:InteractiveObject, currentTarget:Object = null)</div>
+<a class="signatureLink" href="#KeyTypeListener()">KeyTypeListener</a>(obj:InteractiveObject, currentTarget:Object = null, useCapture:Boolean = false, priority:int = 0, useWeakReference:Boolean = false)</div>
 <div class="summaryTableDescription"></div>
 </td><td class="summaryTableOwnerCol">KeyTypeListener</td>
 </tr>
@@ -98,8 +102,29 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <tr class="">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
 <div class="summarySignature">
-<a class="signatureLink" href="#bindKeyDown()">bindKeyDown</a>(useCapture:Boolean = false, priority:int = 0, useWeakReference:Boolean = false):void</div>
+<a class="signatureLink" href="#bindKey()">bindKey</a>(type:String):void</div>
 <div class="summaryTableDescription"></div>
+</td><td class="summaryTableOwnerCol">KeyTypeListener</td>
+</tr>
+<tr class="">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
+<div class="summarySignature">
+<a class="signatureLink" href="#destroy()">destroy</a>():void</div>
+<div class="summaryTableDescription"></div>
+</td><td class="summaryTableOwnerCol">KeyTypeListener</td>
+</tr>
+<tr class="">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
+<div class="summarySignature">
+<a class="signatureLink" href="#destroyImpl()">destroyImpl</a>():void</div>
+<div class="summaryTableDescription"></div>
+</td><td class="summaryTableOwnerCol">KeyTypeListener</td>
+</tr>
+<tr class="">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
+<div class="summarySignature">
+<a class="signatureLink" href="#detach()">detach</a>(obj:InteractiveObject):Boolean</div>
+<div class="summaryTableDescription">[static]</div>
 </td><td class="summaryTableOwnerCol">KeyTypeListener</td>
 </tr>
 <tr class="">
@@ -114,6 +139,36 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <div class="summarySignature">
 <a class="signatureLink" href="#keyboardConstfromCharCode()">keyboardConstfromCharCode</a>(code:uint):String</div>
 <div class="summaryTableDescription">[static]</div>
+</td><td class="summaryTableOwnerCol">KeyTypeListener</td>
+</tr>
+</table>
+</div>
+<a name="protectedMethodSummary"></a>
+<div class="summarySection">
+<div class="summaryTableTitle">Protected Methods</div>
+<table id="summaryTableProtectedMethod" class="summaryTable " cellpadding="3" cellspacing="0">
+<tr>
+<th>&nbsp;</th><th colspan="2">Method</th><th class="summaryTableOwnerCol">Defined&nbsp;by</th>
+</tr>
+<tr class="">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
+<div class="summarySignature">
+<a class="signatureLink" href="#keyDownHandler()">keyDownHandler</a>(e:KeyboardEvent):void</div>
+<div class="summaryTableDescription"></div>
+</td><td class="summaryTableOwnerCol">KeyTypeListener</td>
+</tr>
+<tr class="">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
+<div class="summarySignature">
+<a class="signatureLink" href="#keyHandlerDelegeter()">keyHandlerDelegeter</a>(e:KeyboardEvent, ns:Namespace):void</div>
+<div class="summaryTableDescription"></div>
+</td><td class="summaryTableOwnerCol">KeyTypeListener</td>
+</tr>
+<tr class="">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
+<div class="summarySignature">
+<a class="signatureLink" href="#keyUpHandler()">keyUpHandler</a>(e:KeyboardEvent):void</div>
+<div class="summaryTableDescription"></div>
 </td><td class="summaryTableOwnerCol">KeyTypeListener</td>
 </tr>
 </table>
@@ -164,7 +219,7 @@ showHideInherited();
 </tr>
 </table>
 <div class="detailBody">
-<code>public function KeyTypeListener(obj:InteractiveObject, currentTarget:Object = null)</code><span class="label">Parameters</span>
+<code>public function KeyTypeListener(obj:InteractiveObject, currentTarget:Object = null, useCapture:Boolean = false, priority:int = 0, useWeakReference:Boolean = false)</code><span class="label">Parameters</span>
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
 <td width="20px"></td><td><code><span class="label">obj</span>:InteractiveObject</code></td>
@@ -174,6 +229,24 @@ showHideInherited();
 </tr>
 <tr>
 <td width="20px"></td><td><code><span class="label">currentTarget</span>:Object</code> (default = <code>null</code>)<code></code></td>
+</tr>
+<tr>
+<td class="paramSpacer">&nbsp;</td>
+</tr>
+<tr>
+<td width="20px"></td><td><code><span class="label">useCapture</span>:Boolean</code> (default = <code>false</code>)<code></code></td>
+</tr>
+<tr>
+<td class="paramSpacer">&nbsp;</td>
+</tr>
+<tr>
+<td width="20px"></td><td><code><span class="label">priority</span>:int</code> (default = <code>0</code>)<code></code></td>
+</tr>
+<tr>
+<td class="paramSpacer">&nbsp;</td>
+</tr>
+<tr>
+<td width="20px"></td><td><code><span class="label">useWeakReference</span>:Boolean</code> (default = <code>false</code>)<code></code></td>
 </tr>
 </table>
 </div>
@@ -224,29 +297,56 @@ showHideInherited();
 </tr>
 </table>
 </div>
-<a name="bindKeyDown()"></a>
+<a name="bindKey()"></a>
 <table cellspacing="0" cellpadding="0" class="detailHeader">
 <tr>
-<td class="detailHeaderName">bindKeyDown</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td>
+<td class="detailHeaderName">bindKey</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td>
 </tr>
 </table>
 <div class="detailBody">
-<code>public function bindKeyDown(useCapture:Boolean = false, priority:int = 0, useWeakReference:Boolean = false):void</code><span class="label">Parameters</span>
+<code>public function bindKey(type:String):void</code><span class="label">Parameters</span>
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
-<td width="20px"></td><td><code><span class="label">useCapture</span>:Boolean</code> (default = <code>false</code>)<code></code></td>
+<td width="20px"></td><td><code><span class="label">type</span>:String</code></td>
 </tr>
+</table>
+</div>
+<a name="destroy()"></a>
+<table cellspacing="0" cellpadding="0" class="detailHeader">
 <tr>
-<td class="paramSpacer">&nbsp;</td>
+<td class="detailHeaderName">destroy</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td>
 </tr>
+</table>
+<div class="detailBody">
+<code>public function destroy():void</code>
+</div>
+<a name="destroyImpl()"></a>
+<table cellspacing="0" cellpadding="0" class="detailHeader">
 <tr>
-<td width="20px"></td><td><code><span class="label">priority</span>:int</code> (default = <code>0</code>)<code></code></td>
+<td class="detailHeaderName">destroyImpl</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td>
 </tr>
+</table>
+<div class="detailBody">
+<code>public function destroyImpl():void</code>
+</div>
+<a name="detach()"></a>
+<table cellspacing="0" cellpadding="0" class="detailHeader">
 <tr>
-<td class="paramSpacer">&nbsp;</td>
+<td class="detailHeaderName">detach</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td>
 </tr>
+</table>
+<div class="detailBody">
+<code>public static function detach(obj:InteractiveObject):Boolean</code><span class="label">Parameters</span>
+<table border="0" cellspacing="0" cellpadding="0">
 <tr>
-<td width="20px"></td><td><code><span class="label">useWeakReference</span>:Boolean</code> (default = <code>false</code>)<code></code></td>
+<td width="20px"></td><td><code><span class="label">obj</span>:InteractiveObject</code></td>
+</tr>
+</table>
+<p></p>
+<span class="label">Returns</span>
+<table border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="20"></td><td><code>Boolean</code></td>
 </tr>
 </table>
 </div>
@@ -289,6 +389,54 @@ showHideInherited();
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
 <td width="20"></td><td><code>String</code></td>
+</tr>
+</table>
+</div>
+<a name="keyDownHandler()"></a>
+<table cellspacing="0" cellpadding="0" class="detailHeader">
+<tr>
+<td class="detailHeaderName">keyDownHandler</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td>
+</tr>
+</table>
+<div class="detailBody">
+<code>protected function keyDownHandler(e:KeyboardEvent):void</code><span class="label">Parameters</span>
+<table border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="20px"></td><td><code><span class="label">e</span>:KeyboardEvent</code></td>
+</tr>
+</table>
+</div>
+<a name="keyHandlerDelegeter()"></a>
+<table cellspacing="0" cellpadding="0" class="detailHeader">
+<tr>
+<td class="detailHeaderName">keyHandlerDelegeter</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td>
+</tr>
+</table>
+<div class="detailBody">
+<code>protected function keyHandlerDelegeter(e:KeyboardEvent, ns:Namespace):void</code><span class="label">Parameters</span>
+<table border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="20px"></td><td><code><span class="label">e</span>:KeyboardEvent</code></td>
+</tr>
+<tr>
+<td class="paramSpacer">&nbsp;</td>
+</tr>
+<tr>
+<td width="20px"></td><td><code><span class="label">ns</span>:Namespace</code></td>
+</tr>
+</table>
+</div>
+<a name="keyUpHandler()"></a>
+<table cellspacing="0" cellpadding="0" class="detailHeader">
+<tr>
+<td class="detailHeaderName">keyUpHandler</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td>
+</tr>
+</table>
+<div class="detailBody">
+<code>protected function keyUpHandler(e:KeyboardEvent):void</code><span class="label">Parameters</span>
+<table border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="20px"></td><td><code><span class="label">e</span>:KeyboardEvent</code></td>
 </tr>
 </table>
 </div>

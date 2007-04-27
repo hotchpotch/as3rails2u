@@ -39,10 +39,28 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Pa
 <th>&nbsp;</th><th width="30%">Class</th><th width="70%">Description</th>
 </tr>
 <tr class="prow1">
-<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="Benchmark.html">Benchmark</a></td><td class="summaryTableLastCol">&nbsp;</td>
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="Benchmark.html">Benchmark</a></td><td class="summaryTableLastCol">
+    Simple Benchmark class
+    
+  example:
+  <listing version="3.0">
+  Benchmark.start('check');
+  // code
+  Benchmark.end('check');
+  </listing>
+  
+  <listing version="3.0">
+  Benchmark.benchmark('check2', function() {
+    // code
+  }, this);
+  </listing>
+    </td>
 </tr>
 <tr class="prow0">
-<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="PerformanceViewer.html">PerformanceViewer</a></td><td class="summaryTableLastCol">&nbsp;</td>
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableSecondCol"><a href="PerformanceViewer.html">PerformanceViewer</a></td><td class="summaryTableLastCol">
+    PerformanceViewer
+    
+    PerformanceViewer show FPS, used memory size.</td>
 </tr>
 </table>
 <p></p>
