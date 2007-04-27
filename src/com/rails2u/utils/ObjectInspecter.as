@@ -1,4 +1,4 @@
-package rails2u.utils
+package com.rails2u.utils
 {
     import flash.utils.getQualifiedClassName;
     
@@ -18,14 +18,12 @@ package rails2u.utils
 	        switch(getQualifiedClassName(arg)) {
 	            case 'Object':
 	            case 'Dictionary':
-	                /*
 	                results = [];
 	                for (var key:* in arg) {
 	                    results.push(inspectImpl(key) + ':' + inspectImpl(arg[key], false));
 	                }
 	                str = classFormat(className, '{' + results.join(', ') + '}');
-	                */
-	                str = classFormat(className, arg);
+	                // str = classFormat(className, arg);
 	                break;
 	            case 'Array':
 	              results = [];

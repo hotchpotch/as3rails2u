@@ -1,4 +1,4 @@
-package rails2u.utils
+package com.rails2u.utils
 {
     public class ColorUtil
     {

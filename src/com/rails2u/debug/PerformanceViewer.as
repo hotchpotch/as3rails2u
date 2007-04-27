@@ -1,4 +1,4 @@
-package rails2u.debug {
+package com.rails2u.debug {
     import flash.events.Event;
     import flash.events.KeyboardEvent;
     import flash.display.DisplayObjectContainer;

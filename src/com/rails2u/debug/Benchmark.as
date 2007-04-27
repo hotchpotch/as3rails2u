@@ -1,4 +1,4 @@
-package rails2u.debug {
+package com.rails2u.debug {
     import flash.utils.Dictionary;
     import flash.events.EventDispatcher;
     import flash.events.Event;

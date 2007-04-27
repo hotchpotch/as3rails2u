@@ -1,14 +1,18 @@
-package rails2u.utils
+package com.rails2u.utils
 {
     import flash.events.KeyboardEvent;
     import flash.utils.describeType;
     import flash.ui.Keyboard;
     import flash.display.InteractiveObject;
+    import flash.utils.Dictionary;
     
-        use namespace key_down;
-        // namespace key_up;
+    use namespace key_down;
+    use namespace key_up;
+    
     public class KeyTypeListener
     {
+        private static var objects:Dictionary = new Dictionary;
+        
         public static function attach(
             obj:InteractiveObject, 
             currentTarget:Object = null,
@@ -16,10 +20,21 @@ package rails2u.utils
 	        useWeakReference:Boolean = false
         ):KeyTypeListener
         {
-            var instance:KeyTypeListener = new KeyTypeListener(obj, currentTarget);
-            instance.bindKeyDown(useCapture, priority, useWeakReference);
-            // obj.addEventListener(KeyboardEvent.KEY_UP, keyUpHandler, useCapture, priority, useWeakReference);
+            var instance:KeyTypeListener = new KeyTypeListener(obj, currentTarget, useCapture, priority, useWeakReference);
+            instance.bindKey(KeyboardEvent.KEY_DOWN);
+            instance.bindKey(KeyboardEvent.KEY_UP);
+            objects[obj] = instance;
             return instance;
+        }
+        
+        public static function detach(obj:InteractiveObject):Boolean {
+            if(objects[obj]) {
+                objects[obj].destroyImpl();
+                delete objects[obj];
+                return true;
+            } else {
+                return false;
+            }
         }
         
         protected var obj:InteractiveObject;
@@ -27,9 +42,16 @@ package rails2u.utils
         private var reflection:XML;
         private var callableCache:Object;
         private var isDynamic:Boolean = false;
+        private var useCapture:Boolean;
+        private var priority:int;
+        private var useWeakReference:Boolean;
          
-        public function KeyTypeListener(obj:InteractiveObject, currentTarget:Object = null):void {
+        public function KeyTypeListener(obj:InteractiveObject, currentTarget:Object = null, useCapture:Boolean = false, priority:int = 0, useWeakReference:Boolean = false):void {
             this.obj = obj;
+            this.useCapture = useCapture;
+            this.priority = priority;
+            this.useWeakReference = useWeakReference;
+            
             if (currentTarget == null) {
 	            this.currentTarget = obj;
             } else {
@@ -44,49 +66,89 @@ package rails2u.utils
             }
         }
         
-        public function bindKeyDown(useCapture:Boolean = false, priority:int = 0, useWeakReference:Boolean = false):void {
-            obj.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler, useCapture, priority, useWeakReference);
+        public function bindKey(type:String):void {
+            if(type == KeyboardEvent.KEY_DOWN) {
+                obj.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler, useCapture, priority, useWeakReference);
+            } else {
+                obj.addEventListener(KeyboardEvent.KEY_UP, keyUpHandler, useCapture, priority, useWeakReference);
+            }
         }
         
-        private function keyDownHandler(e:KeyboardEvent):void {
+        public function destroy():void {
+            KeyTypeListener.detach(obj);
+        }
+        
+        internal function destroyImpl():void {
+           obj.removeEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler, useCapture);
+           obj.removeEventListener(KeyboardEvent.KEY_UP, keyUpHandler, useCapture);
+        }
+        
+        protected function keyDownHandler(e:KeyboardEvent):void {
+            keyHandlerDelegeter(e, key_down);
+        }
+        
+        protected function keyUpHandler(e:KeyboardEvent):void {
+            keyHandlerDelegeter(e, key_up);
+        }
+        
+        protected function keyHandlerDelegeter(e:KeyboardEvent, ns:Namespace):void {
             // log(e.currentTarget, e.target, this.currentTarget, this.obj);
             if (!(e.target == this.currentTarget || e.target == this.obj)) {
                 return;
             }
+            // log(String.fromCharCode(e.charCode));
             
             var methodName:String = getMethodName(e);
-            if (isCallable('before', key_down)) {
-                currentTarget.key_down::['before'].call(currentTarget, e);
-            }
-            
-            if (isCallable(methodName, key_down)) {
-                currentTarget.key_down::[methodName].call(currentTarget, e);
-            }
-            
-            if (isCallable('after', key_down)) {
-                currentTarget.key_down::['after'].call(currentTarget, e);
-            } else {
+            // log(methodName, ns);
+            methodCall(e, 'before', ns);
+            methodCall(e, methodName, ns);
+            methodCall(e, 'after', ns);
+        }
+        
+        private function methodCall(e:KeyboardEvent, methodName:String, ns:Namespace):void {
+            var type:uint = callableType(methodName, ns);
+            if(type < METHOD_NOT_CALLABLE) {
+                switch(type) {
+                    case METHOD_CALLABLE:
+		                currentTarget.ns::[methodName].call(currentTarget);
+                        break;
+                    case METHOD_CALLABLE_WITH_ARG:
+		                currentTarget.ns::[methodName].call(currentTarget, e);
+                        break;
+                }
+            } else if(methodName == 'after') {
                 // default after call stopPropagation because always looping event...
                 e.stopPropagation();
             }
         }
         
-        private function isCallable(methodName:String, ns:Namespace):Boolean {
+        private const METHOD_CALLABLE:uint = 1;
+        private const METHOD_CALLABLE_WITH_ARG:uint = 2;
+        private const METHOD_NOT_CALLABLE:uint = 10;
+        
+        private function callableType(methodName:String, ns:Namespace):uint {
             if (isDynamic)
-                return reflection.method.(
-	              String(attribute('uri')) == ns.uri && @name == methodName
-	            ).length() > 0;
+                return callableTypeImpl(methodName, ns);
 	            
             if (callableCache[methodName] == null) {
-	            if (reflection.method.(
-	              String(attribute('uri')) == ns.uri && @name == methodName
-	            ).length() > 0) {
-	                callableCache[methodName] = true;
-	            } else {
-	                callableCache[methodName] = false;
-	            }
+                callableCache[methodName] = callableTypeImpl(methodName, ns);
             }
             return callableCache[methodName];
+        }
+        
+        private function callableTypeImpl(methodName:String, ns:Namespace):uint {
+            var res:XMLList = reflection.method.(
+	              String(attribute('uri')) == ns.uri && @name == methodName
+	            );
+	        if (res.length() > 0) {
+	            if(res.parameter.length() == 0) {
+	                return METHOD_CALLABLE;
+	            } else {
+	                return METHOD_CALLABLE_WITH_ARG;
+	            }
+	        } else {
+	            return METHOD_NOT_CALLABLE;
+	        }
         }
         
         private const RE_NUM_CHAR:RegExp = /^\d$/;
