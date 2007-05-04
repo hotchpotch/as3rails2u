@@ -3,13 +3,18 @@ package
     import flash.display.Sprite;
     import org.libspark.as3unit.runner.AS3UnitCore;
 
+    import flash.utils.describeType;
+
     public class TestKeyTypeListener extends Sprite
     {
         public function TestKeyTypeListener() {
-            AS3UnitCore.main(TestKeyTypeListenerImpl);
+            var a:AS3UnitCore = new AS3UnitCore;
+            a.addListener(new TextLogListener);
+            a.runClasses(TestKeyTypeListenerImpl);
         }
     }
 }
+
 
 import org.libspark.as3unit.test;
 import org.libspark.as3unit.before;

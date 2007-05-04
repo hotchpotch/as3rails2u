@@ -23,8 +23,8 @@ package com.rails2u.utils
         public static function attach(
             obj:InteractiveObject, 
             currentTarget:Object = null,
-	        useCapture:Boolean = false, priority:int = 0, 
-	        useWeakReference:Boolean = false
+            useCapture:Boolean = false, priority:int = 0, 
+            useWeakReference:Boolean = false
         ):KeyTypeListener
         {
             var instance:KeyTypeListener = new KeyTypeListener(obj, currentTarget, useCapture, priority, useWeakReference);
@@ -46,9 +46,8 @@ package com.rails2u.utils
         
         protected var obj:InteractiveObject;
         protected var currentTarget:Object;
-        private var reflection:XML;
-        private var callableCache:Object;
-        private var isDynamic:Boolean = false;
+        private var reflection:Reflection;
+        private var callableCache:Object = {};
         private var useCapture:Boolean;
         private var priority:int;
         private var useWeakReference:Boolean;
@@ -60,17 +59,11 @@ package com.rails2u.utils
             this.useWeakReference = useWeakReference;
             
             if (currentTarget == null) {
-	            this.currentTarget = obj;
+                this.currentTarget = obj;
             } else {
-	            this.currentTarget = currentTarget;
+                this.currentTarget = currentTarget;
             }
-            reflection = describeType(this.currentTarget);
-            
-            if (reflection.type.isDynamic == 'true') {
-                isDynamic = true;
-            } else {
-                callableCache = {};
-            }
+            reflection = Reflection.getInstance(this.currentTarget);
         }
         
         public function bindKey(type:String):void {
@@ -113,49 +106,23 @@ package com.rails2u.utils
         }
         
         private function methodCall(e:KeyboardEvent, methodName:String, ns:Namespace):void {
-            var type:uint = callableType(methodName, ns);
-            if(type < METHOD_NOT_CALLABLE) {
-                switch(type) {
-                    case METHOD_CALLABLE:
-		                currentTarget.ns::[methodName].call(currentTarget);
+            var argsNum:int = reflection.methodArgs(methodName, ns);
+            if(argsNum >= 0) {
+                switch(argsNum) {
+                    case 0:
+                        currentTarget.ns::[methodName].call(currentTarget);
                         break;
-                    case METHOD_CALLABLE_WITH_ARG:
-		                currentTarget.ns::[methodName].call(currentTarget, e);
+                    case 1:
+                        currentTarget.ns::[methodName].call(currentTarget, e);
+                        break;
+                    default:
+                        throw new Error(methodName + ' arguments should be 0 or 1');
                         break;
                 }
             } else if(methodName == 'after') {
                 // default after call stopPropagation because always looping event...
                 e.stopPropagation();
             }
-        }
-        
-        private const METHOD_CALLABLE:uint = 1;
-        private const METHOD_CALLABLE_WITH_ARG:uint = 2;
-        private const METHOD_NOT_CALLABLE:uint = 10;
-        
-        private function callableType(methodName:String, ns:Namespace):uint {
-            if (isDynamic) return callableTypeImpl(methodName, ns);
-	            
-	        callableCache[ns.uri] ||= {}; 
-            if (callableCache[ns.uri][methodName] == null) {
-                callableCache[ns.uri][methodName] = callableTypeImpl(methodName, ns);
-            }
-            return callableCache[ns.uri][methodName];
-        }
-        
-        private function callableTypeImpl(methodName:String, ns:Namespace):uint {
-            var res:XMLList = reflection.method.(
-	              String(attribute('uri')) == ns.uri && @name == methodName
-	            );
-	        if (res.length() > 0) {
-	            if(res.parameter.length() == 0) {
-	                return METHOD_CALLABLE;
-	            } else {
-	                return METHOD_CALLABLE_WITH_ARG;
-	            }
-	        } else {
-	            return METHOD_NOT_CALLABLE;
-	        }
         }
         
         private const RE_NUM_CHAR:RegExp = /^\d$/;
@@ -171,21 +138,8 @@ package com.rails2u.utils
             return char;
         }
         
-        private static var keyboardRefrection:XML = describeType(Keyboard);
         public static function keyboardConstfromCharCode(code:uint):String {
-            return keyboardConstTable[code];
-        }
-        
-        private static var _keyboardConstTable:Object;
-        public static function get keyboardConstTable():Object {
-            if(!_keyboardConstTable) {
-                _keyboardConstTable = {};
-	            var keyboardRefrection:XML = describeType(Keyboard);
-	            for each(var _const:String in keyboardRefrection.constant.@name) {
-	                _keyboardConstTable[Keyboard[_const]] = _const;
-	            }
-            }
-            return _keyboardConstTable;
+            return Reflection.getInstance(Keyboard).constantsTable[code];
         }
     }
 }
