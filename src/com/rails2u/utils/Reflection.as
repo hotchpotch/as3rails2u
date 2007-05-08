@@ -44,7 +44,7 @@ package com.rails2u.utils {
         }
 
         private static var instanceCache:Object = {};
-        public static function getInstance(o:*):Reflection {
+        public static function factory(o:*):Reflection {
             var className:String;
             className = o as String;
 

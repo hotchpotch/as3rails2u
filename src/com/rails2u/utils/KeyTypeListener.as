@@ -63,7 +63,7 @@ package com.rails2u.utils
             } else {
                 this.currentTarget = currentTarget;
             }
-            reflection = Reflection.getInstance(this.currentTarget);
+            reflection = Reflection.factory(this.currentTarget);
         }
         
         public function bindKey(type:String):void {
@@ -139,7 +139,7 @@ package com.rails2u.utils
         }
         
         public static function keyboardConstfromCharCode(code:uint):String {
-            return Reflection.getInstance(Keyboard).constantsTable[code];
+            return Reflection.factory(Keyboard).constantsTable[code];
         }
     }
 }
