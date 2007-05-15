@@ -3,6 +3,8 @@ package com.rails2u.utils {
     import flash.utils.getQualifiedClassName;
     import flash.utils.getDefinitionByName;
     import flash.utils.Dictionary;
+    import com.rails2u.utils.Reflection;
+    import flash.events.Event;
 
     public class Reflection {
         private static var xmlCache:Object = {}
@@ -67,6 +69,33 @@ package com.rails2u.utils {
 
         public function get constantsTable():Object {
             return cache['constantsTable'] ||= Reflection.constantsTable(type);
+        }
+
+        public function getAllDispatchEvents():Array {
+            var res:Array = [];
+            res = res.concat(getDispatchEvents());
+            for each (var klass:String in type.extendsClass.@type) {
+                var r:Reflection = Reflection.factory(klass);
+                res = res.concat(r.getDispatchEvents());
+            }
+            //Reflection.factory(target).type.@name)).type.metadata.arg.(@key == 'name').@value
+            return res;
+        }
+
+        public function getDispatchEvents():Array {
+            var l:XMLList = type.metadata.(@name == 'Event');
+            var res:Array = [];
+            for each(var metadata:XML in l) {
+                var name:String = metadata.arg.(@key == 'name').@value;
+                var klass:Object = getDefinitionByName(metadata.arg.(@key == 'type').@value);
+                res.push({'name':name , 'class':klass});
+            }
+            for each(metadata in type.factory.metadata.(@name == 'Event')) {
+                name = metadata.arg.(@key == 'name').@value;
+                klass = getDefinitionByName(metadata.arg.(@key == 'type').@value);
+                res.push({'name':name , 'class':klass});
+            }
+            return res;
         }
     }
 }
