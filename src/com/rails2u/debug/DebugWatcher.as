@@ -1,10 +1,10 @@
 package com.rails2u.debug {
-    import flash.events.EventDispatcher;
+    import flash.events.IEventDispatcher;
     import com.rails2u.utils.Reflection;
     import flash.events.Event;
     import mx.logging.Log;
     public class DebugWatcher {
-        public static function monitorEvents(target:EventDispatcher, ... arg):void {
+        public static function monitorEvents(target:IEventDispatcher, ... arg):void {
             if ( arg.length > 0 ) {
                 for each(var evName:String in arg) {
                     target.addEventListener(evName, eventLog);
@@ -18,7 +18,7 @@ package com.rails2u.debug {
             }
         }
 
-        public static function unmonitorEvents(target:EventDispatcher, ... arg):void {
+        public static function unmonitorEvents(target:IEventDispatcher, ... arg):void {
             if ( arg.length > 0 ) {
                 for each(var evName:String in arg) {
                     target.removeEventListener(evName, eventLog);
