@@ -2,7 +2,8 @@ package com.rails2u.utils {
     import flash.display.Graphics;
 
     public class DrawUtil {
-        public static function drawStar(graphics:Graphics,                                                                                        xPos:Number = 0,
+        public static function drawStar(graphics:Graphics, 
+                xPos:Number = 0,
                 yPos:Number = 0,
                 sides:uint = 5,
                 innerRadius:Number = 20,
@@ -21,10 +22,43 @@ package com.rails2u.utils {
                     }
                 }
                 if (type == 'curve') {
-                    graphics.curveTo(                                                                                                                 outerRadius * Math.cos(theta) + xPos, outerRadius * Math.sin(theta) + yPos,                                                       innerRadius * Math.cos(theta + halfIncr) + xPos, innerRadius * Math.sin(theta + halfIncr) + yPos
-                            );
+                    graphics.curveTo(outerRadius * Math.cos(theta) + xPos, outerRadius * Math.sin(theta) + yPos,
+                    innerRadius * Math.cos(theta + halfIncr) + xPos, innerRadius * Math.sin(theta + halfIncr) + yPos);
                 } else {
                     graphics.lineTo(outerRadius * Math.cos(theta) + xPos, outerRadius * Math.sin(theta) + yPos);
+                    graphics.lineTo(innerRadius * Math.cos(theta + halfIncr) + xPos, innerRadius * Math.sin(theta + halfIncr) + yPos);
+                }
+                theta += incr;
+            }
+        }
+
+
+        public static function drawStarLight(graphics:Graphics, 
+                xPos:Number = 0,
+                yPos:Number = 0,
+                sides:uint = 10,
+                innerRadius:Number = 10,
+                outerRadius:Number = 30,
+                type:String = 'line',
+                sizePercent:Number = 4/5
+                ):void {
+            var theta:Number = 0.0;
+            var incr:Number = Math.PI * 2.0 / sides;
+            var halfIncr:Number = incr / 2.0;
+            for (var i:uint = 0; i <= sides; i++) {
+                var rOuterRadius:Number = MathUtil.randomBetween(outerRadius * sizePercent, outerRadius);
+                if(i == 0) {
+                    if (type == 'curve') {
+                        graphics.moveTo(innerRadius * Math.cos(theta + halfIncr) + xPos, innerRadius * Math.sin(theta + halfIncr) + yPos);
+                    } else {
+                        graphics.moveTo(rOuterRadius * Math.cos(theta) + xPos, rOuterRadius * Math.sin(theta) + yPos);
+                    }
+                }
+                if (type == 'curve') {
+                    graphics.curveTo(rOuterRadius * Math.cos(theta) + xPos, rOuterRadius * Math.sin(theta) + yPos,
+                    innerRadius * Math.cos(theta + halfIncr) + xPos, innerRadius * Math.sin(theta + halfIncr) + yPos);
+                } else {
+                    graphics.lineTo(rOuterRadius * Math.cos(theta) + xPos, rOuterRadius* Math.sin(theta) + yPos);
                     graphics.lineTo(innerRadius * Math.cos(theta + halfIncr) + xPos, innerRadius * Math.sin(theta + halfIncr) + yPos);
                 }
                 theta += incr;
