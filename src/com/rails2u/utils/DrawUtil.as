@@ -1,5 +1,7 @@
 package com.rails2u.utils {
     import flash.display.Graphics;
+    import flash.geom.Rectangle;
+    import flash.display.Shape;
 
     public class DrawUtil {
         public static function drawStar(graphics:Graphics, 
@@ -63,6 +65,28 @@ package com.rails2u.utils {
                 }
                 theta += incr;
             }
+        }
+
+        public static function drawCenterSquare(graphics:Graphics, size:uint = 10, autoLineStyle:Boolean = true):void {
+            if (autoLineStyle) simpleLineStyle(graphics);
+            graphics.drawRect(-size / 2, -size / 2, size, size);
+            graphics.moveTo(-size / 2, -size / 2);
+            graphics.lineTo(size / 2, size / 2);
+            graphics.moveTo(-size / 2, size / 2);
+            graphics.lineTo(size / 2, -size / 2);
+        }
+
+        public static function drawRectangle(graphics:Graphics, rec:Rectangle, autoLineStyle:Boolean = true):void {
+            if (autoLineStyle) simpleLineStyle(graphics);
+            graphics.drawRect(rec.x, rec.y, rec.width, rec.height);
+        }
+
+        public static function drawFrame(d:Shape, autoLineStyle:Boolean = true):void {
+            drawRectangle(d.graphics, d.getRect(d), autoLineStyle);
+        }
+
+        public static function simpleLineStyle(graphics:Graphics):void {
+            graphics.lineStyle(0, 0xEEEEEE);
         }
     }
 }
