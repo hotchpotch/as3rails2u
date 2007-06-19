@@ -1,18 +1,42 @@
 package com.rails2u.typofy {
     import flash.display.Sprite;
-    import flash.text.TextFormat;
+    import flash.geom.Point;
     import flash.geom.Rectangle;
     import flash.text.TextField;
-    import flash.geom.Point;
-    import com.rails2u.utils.DrawUtil;
+    import flash.text.TextFormat;
+
     public class TypofyCharSprite extends Sprite {
 
         public var textField:TextField;
         public var typofy:Typofy;
-        public var row:uint;
-        public var col:uint;
+        
+        
+        private var _char:String;
+        public function get char():String {
+            return _char;
+        }
+        
+        public function set char(newchar:String):void {
+            this.textField.text = newchar;
+            this._char = newchar;
+        }
+
+        public function setDefaultChar():void {
+            this.textField.text = _char;
+        }
+
+        public function get row():uint {
+            return this.charIndex - typofy.getLineOffset(col);
+        }
+
+        public function get col():uint {
+            return typofy.getLineIndexOfChar(this.charIndex);
+        }
+
         public var boundaries:Rectangle;
-        public var index:uint;
+        public var charIndex:uint;
+         
+        public var extra:Object = {};
         
         protected var _centerPoint:Point;
         
@@ -20,16 +44,18 @@ package com.rails2u.typofy {
             return _centerPoint;
         }
         
-        public function TypofyCharSprite(_char:String, typofy:Typofy, index:uint, boundaries:Rectangle) {
+        public function TypofyCharSprite(_char:String, typofy:Typofy, _index:uint, boundaries:Rectangle) {
+            super();
             textField = new TextField;
+            textField.selectable = false;
             this.addChild(textField);
             this.boundaries = boundaries;
 
-            this.index = index;
+            this.charIndex = _index;
             this.typofy = typofy;
 
             init();
-            textField.text = _char;
+            this.char = _char;
         }
 
         public function drawBorder():void {
@@ -38,9 +64,7 @@ package com.rails2u.typofy {
         }
 
         protected function init():void {
-            var textFormat:TextFormat = typofy.getTextFormat(index);
-            this.row = typofy.getFirstCharInParagraph(index);
-            this.col = typofy.getLineIndexOfChar(index);
+            var textFormat:TextFormat = typofy.getTextFormat(this.charIndex);
 
             this.x = boundaries.x + boundaries.width / 2;
             this.y = boundaries.y + boundaries.height / 2;
