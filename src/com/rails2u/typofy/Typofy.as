@@ -7,7 +7,6 @@ package com.rails2u.typofy {
         public var charSprites:Array = [];
         public var container:Sprite;
         private var inited:Boolean = false;
-        public const PADDING_MAGIC_NUMBER:int = 2; // why? Bug? (193249) 
 
         public function Typofy()
         {
@@ -35,8 +34,6 @@ package com.rails2u.typofy {
                     if (! (boundaries && bounds.containsRect(boundaries))) {
                         continue;
                     }
-                    boundaries.x -= PADDING_MAGIC_NUMBER;
-                    boundaries.y -= PADDING_MAGIC_NUMBER;
 
                     var mSprite:TypofyCharSprite = new TypofyCharSprite(c, 
                         this,
@@ -54,7 +51,7 @@ package com.rails2u.typofy {
             }
         }
 
-        public function start(func:Function):void {
+        public function each(func:Function):void {
             init();
             for (var charIndex:uint = 0; charIndex < charSprites.length; charIndex++) {
                 func(charSprites[charIndex]);
