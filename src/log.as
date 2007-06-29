@@ -15,9 +15,10 @@ package {
   * [[1, 2, 3], [4, [5, 6]]], #&lt;flash.display::Sprite:[object Sprite]&gt;
   * </listing>
   */  
-  public function log(... args):void {
+  public function log(... args):String {
     var r:String = ObjectInspecter.inspect.apply(null, args);
     trace(r)
     ExternalInterface.call('console.log', r);
+    return r;
   }
 }
