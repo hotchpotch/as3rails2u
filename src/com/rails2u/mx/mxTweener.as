@@ -2,6 +2,7 @@ package com.rails2u.mx {
     import mx.effects.Effect;
     import mx.effects.AnimateProperty;
     import mx.effects.easing.*;
+    import mx.effects.*;
     import flash.utils.getDefinitionByName;
     import flash.utils.getQualifiedClassName;
     import mx.events.TweenEvent;
@@ -10,11 +11,25 @@ package com.rails2u.mx {
     import mx.utils.DescribeTypeCache;
     import mx.utils.DescribeTypeCacheRecord;
     import mx.effects.Parallel;
+    import mx.effects.CompositeEffect;
+    import mx.effects.Sequence;
+    import mx.core.mx_internal;
+    import mx.events.EffectEvent;
+    import mx.effects.effectClasses.TweenEffectInstance;
+    import mx.effects.TweenEffect;
+    use namespace mx_internal;
 
+    /*
+     * prop はわけよう
+     */
     public class mxTweener {
         private static const EASYING_CLASSES:Array = [
             Back, Circular, Elastic, Quartic, Sine,
             Bounce, Cubic, Exponential, Quadratic, Quintic
+        ];
+
+        private static const TWEEN_EFFECT_CLASSES:Array = [
+            AnimateProperty, Blur, Dissolve, Fade, Glow, Move, Pause, Resize, Rotate, Zoom
         ];
 
         public static const EASYING_FUNCTIONS:Object = createEasyingFunctions();
@@ -31,14 +46,49 @@ package com.rails2u.mx {
             return o;
         }
 
-        public static function addTween(options:Object):Effect {
-            var pa:Parallel = new Parallel();
+        public static function tween(... args):Effect {
+            if(args.length == 1) {
+                if(args[0] is Array) {
+                    var par:Parallel= new Parallel;
+                    for each (var options:Object in args[0]) {
+                        par.addChild(factoryTween(options));
+                    }
+                    return par;
+                } else {
+                    return factoryTween(args[0]);
+                }
+            }
+            if(args.length > 1) {
+                var seq:Sequence = new Sequence;
+                for each (options in args) {
+                    seq.addChild(factoryTween(options));
+                }
+                return seq;
+            }
+            return new CompositeEffect;
+        }
 
-            var ef:AnimateProperty = new AnimateProperty();
+        public static function factoryTween(options:Object):Effect {
+            if (options.properties) {
+                return animatePropertyTween(options);
+            } else {
+                return effectTween(options);
+            }
+        }
+
+        public static function effectTween(options:Object):Effect {
+            var klass:Class;
+            if(options.klass as Class) {
+                klass = options.klass;
+            } else {
+               klass = Class(getDefinitionByName('mx.effects.' + options.klass));
+            }
+            var ef:Effect = new klass();
+
             var desc:XML = DescribeTypeCache.describeType(ef).typeDescription;
             var effectOptions:Object = {};
-
-            for (var key:String in options) {
+            var key:String;
+            for (key in options) {
                 if(
                     desc.variable.(@name == key).@name.toString() || 
                     desc.accessor.(@name == key && @access == 'readwrite').@name.toString()
@@ -48,53 +98,89 @@ package com.rails2u.mx {
                 }
             }
 
+            if (options.easing is Function) {
+                effectOptions.easingFunction = options.easing;
+            } else if (options.easing is String){
+                effectOptions.easingFunction = EASYING_FUNCTIONS[options.easing.toLocaleLowerCase()];
+            }
+
+            ef = createEffect(klass, effectOptions);
+            if(options.repeatReverse) {
+                if(ef.repeatCount != 0) {
+                    ef.addEventListener(TweenEvent.TWEEN_START, 
+                            createRepeatCountHandler(ef.repeatCount));
+                    ef.repeatCount = 0;
+                }
+                ef.addEventListener(TweenEvent.TWEEN_END, tweenReverseHandler);
+            }
+            return ef;
+        }
+
+        public static function animatePropertyTween(options:Object):Parallel {
+            var parallel:Parallel = new Parallel();
+
+            var ef:AnimateProperty = new AnimateProperty();
+            var desc:XML = DescribeTypeCache.describeType(ef).typeDescription;
+            var effectOptions:Object = {};
+
+            var key:String;
+            for (key in options) {
+                if(
+                    desc.variable.(@name == key).@name.toString() || 
+                    desc.accessor.(@name == key && @access == 'readwrite').@name.toString()
+                ) {
+                    effectOptions[key] = options[key];
+                    delete options[key];
+                }
+            }
 
             if (options.easing is Function) {
                 effectOptions.easingFunction = options.easing;
-                delete options.easing;
             } else if (options.easing is String){
                 effectOptions.easingFunction = EASYING_FUNCTIONS[options.easing.toLocaleLowerCase()];
-                delete options.easing;
             }
 
-            var repeatReverseFlag:Boolean = false;
-            if (options.repeatReverse) {
-                repeatReverseFlag = true;
-                delete options.repeatReverse;
-            }
-
-            if (options.properties) {
-                var props:Object = options.properties;
-                delete options.properties;
-                for (var key:String in props) {
-                    options[key] = props[key];
-                }
-            };
-
-            for (var key:String in options) {
-                var effect:AnimateProperty = createAnimateProperty(effectOptions);
+            var properties:Object = options.properties;
+            for (key in properties) {
+                var effect:AnimateProperty = AnimateProperty(createEffect(AnimateProperty, effectOptions));
                 effect.property = key;
-                if (options[key] is Array) {
-                    effect.fromValue = options[key][0];
-                    effect.toValue = options[key][1];
+                if (properties[key] is Array) {
+                    effect.fromValue = properties[key][0];
+                    effect.toValue = properties[key][1];
                 } else {
-                    effect.toValue = options[key];
+                    effect.toValue = properties[key];
                 }
-                pa.addChild(effect);
+                parallel.addChild(effect);
             }
 
-            if(repeatReverseFlag) {
-                for each(var eff:Effect in pa.children) {
+            if(options.repeatReverse) {
+                for each(var eff:Effect in parallel.children) {
                     // eff.repeatCount = 0;
+                    // dirty code... :(
+                    if(eff.repeatCount != 0) {
+                        eff.addEventListener(TweenEvent.TWEEN_START, 
+                          createRepeatCountHandler(eff.repeatCount));
+                        eff.repeatCount = 0;
+                    }
                     eff.addEventListener(TweenEvent.TWEEN_END, tweenReverseHandler);
                 }
             }
 
-            return Effect(pa);
+            return parallel;
         }
 
-        private static function createAnimateProperty(effectOptions:Object):AnimateProperty {
-            var ef:AnimateProperty = new AnimateProperty();
+        private static function createRepeatCountHandler(origRepCount:uint):Function {
+            var repCount:uint = 0;
+            return function(e:TweenEvent):void {
+                if(origRepCount == repCount++) {
+                    e.currentTarget.end();
+                    repCount = 0;
+                }
+            }
+        }
+
+        private static function createEffect(klass:Class, effectOptions:Object):Effect {
+            var ef:Effect = new klass();
             for (var key:String in effectOptions) {
                 ef[key] = effectOptions[key];
             }
@@ -102,7 +188,7 @@ package com.rails2u.mx {
         }
 
         private static function tweenReverseHandler(e:TweenEvent):void {
-            e.target.reverse();
+            e.currentTarget.reverse();
         }
     }
 }
