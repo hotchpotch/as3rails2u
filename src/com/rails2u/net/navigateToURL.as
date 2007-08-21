@@ -33,7 +33,7 @@ package com.rails2u.net {
         );
 
         if (!res) {
-            var jsURL:String = 'javascript:window.open("' + url + '","' + windows + '");void(0);';
+            var jsURL:String = 'javascript:(function(){window.open("' + url + '", "' + windows + '")})();'
             var req:URLRequest = new URLRequest(jsURL);
             flash.net.navigateToURL(req, '_self');
         }
