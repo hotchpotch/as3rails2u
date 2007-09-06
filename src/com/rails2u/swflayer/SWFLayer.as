@@ -2,11 +2,12 @@ package com.rails2u.swflayer {
     import flash.external.ExternalInterface;
     import flash.utils.Proxy;
     import flash.utils.flash_proxy;
+    import flash.errors.IOError;
 
     public dynamic class SWFLayer extends Proxy {
         private static var _instance:SWFLayer;
         private static var _style:SWFStyle;
-        public function SWFLayer(position:String = 'absolute') {
+        public function SWFLayer() {
             if(SWFLayer._instance) throw(new ArgumentError('Please access SWFLayer.getInstance()'));
 
             var x:String = getProperty('offsetTop');
@@ -14,15 +15,9 @@ package com.rails2u.swflayer {
             _style = new SWFStyle(this);
             this.x = Number(x);
             this.y = Number(y);
-            this.height = NaN;
-            this.width = NaN;
-            if(_style.position != position) _style.position = position;
-
-            //setStyle('x', x);
-            //setStyle('y', y);
-            //setStyle('height', SWFLayer.AUTO);
-            //setStyle('width', SWFLayer.AUTO);
-            //setStyle('position', position);
+            this.height = this.clientHeight;
+            this.width = this.clientWidth;
+            if (_style.position != 'absolute') _style.position = 'absolute';
         }
 
         public function get style():SWFStyle {
@@ -83,9 +78,42 @@ package com.rails2u.swflayer {
             return 0;
         }
 
+        public function fitInBrowser():void {
+             this.x = this.scrollLeft;
+             this.y = this.scrollTop;
+             this.width = this.browserWidth;
+             this.height = this.browserHeight;
+        }
+
+        public function get browserWidth():Number {
+            //return execExternalIntarface('return document.body.clientWidth') as Number; // IOError ;(
+            return execExternalIntarface('return document.getElementsByTagName("body")[0].clientWidth') as Number;
+        }
+
+        public function get browserHeight():Number {
+            return execExternalIntarface('return document.getElementsByTagName("body")[0].clientHeight') as Number;
+        }
+
+        public function get htmlWidth():Number {
+            return execExternalIntarface('return document.getElementsByTagName("html")[0].clientWidth') as Number;
+        }
+
+        public function get htmlHeight():Number {
+            return execExternalIntarface('return document.getElementsByTagName("html")[0].clientHeight') as Number;
+        }
+
+        public function get scrollTop():Number {
+            return execExternalIntarface('return window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop') as Number;
+        }
+
+        public function get scrollLeft():Number {
+            return execExternalIntarface('return window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft') as Number;
+        }
+
         public function get objectID():String {
             return ExternalInterface.objectID;
         }
+
         public function setProperty(name:String, value:String):void {
             exec(name + ' = "' + value + '"');
         }
@@ -110,6 +138,9 @@ package com.rails2u.swflayer {
 
        override flash_proxy function getProperty(name:*):* {
            return this.getProperty(name);
+       }
+
+       override flash_proxy function callProperty(name:*, ...rest):* {
        }
     }
 }
