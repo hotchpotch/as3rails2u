@@ -39,6 +39,7 @@ package com.rails2u.utils
             for (var i:uint = 0; i < cycle; i++) {
                 // a.push(f(
             }
+            return [];
         }
 
         public static function sinGenerator(start:int = 255, end:int = 0, cycle:uint = 90):Function {

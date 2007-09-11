@@ -3,20 +3,25 @@ package com.rails2u.swflayer {
     import flash.utils.Proxy;
     import flash.utils.flash_proxy;
     import flash.errors.IOError;
+    import flash.errors.IllegalOperationError;
 
     public dynamic class SWFLayer extends Proxy {
         private static var _instance:SWFLayer;
         private static var _style:SWFStyle;
+
         public function SWFLayer() {
-            if(SWFLayer._instance) throw(new ArgumentError('Please access SWFLayer.getInstance()'));
+            if (SWFLayer._instance) throw (new ArgumentError('Please access SWFLayer.getInstance()'));
+            if (!ExternalInterface.available) throw (new IllegalOperationError('ExternalInterface.available should be true.'));
+
+            // defineJSFuncitons();
 
             var x:String = getProperty('offsetTop');
             var y:String = getProperty('offsetLeft');
             _style = new SWFStyle(this);
-            this.x = Number(x);
-            this.y = Number(y);
-            this.height = this.clientHeight;
-            this.width = this.clientWidth;
+            //this.x = Number(x);
+            //this.y = Number(y);
+            //this.height = this.clientHeight;
+            //this.width = this.clientWidth;
             if (_style.position != 'absolute') _style.position = 'absolute';
         }
 
@@ -79,35 +84,35 @@ package com.rails2u.swflayer {
         }
 
         public function fitInBrowser():void {
-             this.x = this.scrollLeft;
-             this.y = this.scrollTop;
-             this.width = this.browserWidth;
-             this.height = this.browserHeight;
+            this.x = this.scrollLeft;
+            this.y = this.scrollTop;
+            this.width = this.browserWidth;
+            this.height = this.browserHeight;
         }
 
         public function get browserWidth():Number {
-            //return execExternalIntarface('return document.body.clientWidth') as Number; // IOError ;(
-            return execExternalIntarface('return document.getElementsByTagName("body")[0].clientWidth') as Number;
+            //return execExternalInterface('return document.body.clientWidth') as Number; // IOError ;(
+            return execExternalInterface('return document.getElementsByTagName("body")[0].clientWidth') as Number;
         }
 
         public function get browserHeight():Number {
-            return execExternalIntarface('return document.getElementsByTagName("body")[0].clientHeight') as Number;
+            return execExternalInterface('return document.getElementsByTagName("body")[0].clientHeight') as Number;
         }
 
         public function get htmlWidth():Number {
-            return execExternalIntarface('return document.getElementsByTagName("html")[0].clientWidth') as Number;
+            return execExternalInterface('return document.getElementsByTagName("html")[0].clientWidth') as Number;
         }
 
         public function get htmlHeight():Number {
-            return execExternalIntarface('return document.getElementsByTagName("html")[0].clientHeight') as Number;
+            return execExternalInterface('return document.getElementsByTagName("html")[0].clientHeight') as Number;
         }
 
         public function get scrollTop():Number {
-            return execExternalIntarface('return window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop') as Number;
+            return execExternalInterface('return window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop') as Number;
         }
 
         public function get scrollLeft():Number {
-            return execExternalIntarface('return window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft') as Number;
+            return execExternalInterface('return window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft') as Number;
         }
 
         public function get objectID():String {
@@ -124,10 +129,10 @@ package com.rails2u.swflayer {
 
         public function exec(cmd:String):* {
             cmd = "return document.getElementById('" + objectID + "')." + cmd;
-            return execExternalIntarface(cmd);
+            return execExternalInterface(cmd);
         }
 
-        public static function execExternalIntarface(cmd:String):* {
+        public static function execExternalInterface(cmd:String):* {
             cmd = "(function() {" + cmd + ";})";
             return ExternalInterface.call(cmd);
         }
@@ -141,6 +146,20 @@ package com.rails2u.swflayer {
        }
 
        override flash_proxy function callProperty(name:*, ...rest):* {
+       }
+
+       private function getterClosure(name:String):Function {
+           var self:SWFLayer = this;
+           return function():* { return self[name] };
+       }
+
+       private function defineJSFuncitons():void {
+           ExternalInterface.addCallback('fitInBrowser', fitInBrowser);
+
+           var a:Array = ['browserWidth', 'browserHeight', 'htmlWidth', 'htmlHeight', 'scrollTop', 'scrollLeft', 'x', 'y', 'width', 'height'];
+           for each (var closureName:String in a) {
+               ExternalInterface.addCallback(closureName, getterClosure(closureName));
+           }
        }
     }
 }
