@@ -11,7 +11,8 @@ package com.rails2u.net
      * URLLoader with Timeout
      * loader.addEventListener(IOErrorEvent.IO_ERROR, 
      *    function(e:*):void { trace('timeout!') });
-     * loader.loadWithTimeout(request, 30);     */
+     * loader.loadWithTimeout(request, 30);
+     */
     public class URLLoaderWithTimeout extends URLLoader
     {
         public function URLLoaderWithTimeout(request:URLRequest=null)

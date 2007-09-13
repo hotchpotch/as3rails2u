@@ -3,6 +3,9 @@ package com.rails2u.net {
     import flash.external.ExternalInterface;
     import flash.events.Event;
     import flash.errors.IllegalOperationError;
+    import flash.events.TimerEvent;
+    import flash.events.IOErrorEvent;
+    import flash.utils.Timer;
 
     public class JSONPLoader extends EventDispatcher {
         public static var callbackObjects:Object = {};
@@ -11,13 +14,14 @@ package com.rails2u.net {
         public var encoding:String = 'UTF-8';
         public var callbackQueryName:String = 'callback';
         public var data:Object;
+        public var timeout:Number = 30;
 
         public static var inited:Boolean = false;
 
         public function JSONPLoader(url:String = ''):void {
             if (!ExternalInterface.available) throw (new IllegalOperationError('ExternalInterface.available should be true.'));
-
             if (!inited) init();
+
             this.url = url;
         }
 
@@ -27,22 +31,15 @@ package com.rails2u.net {
 
         }
 
-        private function jsFuncRegister(callbackFuncName:String):void {
-            var js:String = 'if (!window.as3callbacks) window.as3callbacks = {};window.as3callbacks["' + callbackFuncName + 
-                '"] = function(obj) { document.getElementById("' + 
-                ExternalInterface.objectID + '").jsonpCallbacks("' + callbackFuncName + '",obj) };';
-            log(js);
-            execExternalInterface(js);
-        }
-
-        public function load():void {
+        public function load(url:String = undefined):void {
+            url ||= this.url;
             var callbackFuncName:String = '_' + (new Date()).getTime().toString();
-            log(callbackFuncName);
-            jsFuncRegister(callbackFuncName);
+            jsAddCallback(callbackFuncName);
 
             var loadURL:String = url + ((url.indexOf('?') > 0) ?  '&' : '?') + 
                     encodeURIComponent(callbackQueryName) + '=' + encodeURIComponent('as3callbacks.' + callbackFuncName);
             callbackObjects[callbackFuncName] = this;
+            observeTimeout(timeout, callbackFuncName);
             createScriptElement(loadURL);
         }
 
@@ -52,6 +49,7 @@ package com.rails2u.net {
             js.push("script.charset = '" + encoding + "';");
             js.push("script.src = '" + loadURL + "';");
             js.push("setTimeout(function(){document.body.appendChild(script);}, 10);");
+            dispatchEvent(new Event(Event.OPEN));
             execExternalInterface(js.join("\n"));
         }
 
@@ -66,6 +64,41 @@ package com.rails2u.net {
         private static function execExternalInterface(cmd:String):* {
             cmd = "(function() {" + cmd + ";})";
             return ExternalInterface.call(cmd);
+        }
+
+        private function jsAddCallback(callbackFuncName:String):void {
+            var js:String = 'if (!window.as3callbacks) window.as3callbacks = {};window.as3callbacks["' + callbackFuncName + 
+                '"] = function(obj) { document.getElementById("' + 
+                ExternalInterface.objectID + '").jsonpCallbacks("' + callbackFuncName + '",obj) };';
+            execExternalInterface(js);
+        }
+
+        private function jsRemoveCallback(callbackFuncName:String):void {
+            var js:String = 'if (window.as3callbacks) window.as3callbacks["' + callbackFuncName + '"] = function() {};';
+            execExternalInterface(js);
+        }
+
+        private var observeTimer:Timer;
+        private function observeTimeout(sec:Number, callbackFuncName:String):void
+        {
+            observeTimer = new Timer(sec * 1000, 1);
+            observeTimer.addEventListener(TimerEvent.TIMER, timeoutErrorHandlerBind(callbackFuncName), false, 1, true);
+            observeTimer.start();
+        }
+
+        private function timeoutErrorHandlerBind(callbackFuncName:String):Function {
+            return function(e:TimerEvent):void {
+                jsRemoveCallback(callbackFuncName);
+                timeoutErrorHandler(e);
+            }
+        }
+
+        private function timeoutErrorHandler(e:TimerEvent):void 
+        {
+            dispatchEvent(new IOErrorEvent(IOErrorEvent.IO_ERROR, false, false, 'Request timeout'));
+            observeTimer.removeEventListener(TimerEvent.TIMER, timeoutErrorHandler);
+            observeTimer.stop();
+            observeTimer = null;
         }
     }
 }
