@@ -6,34 +6,55 @@ package com.rails2u.net {
     import flash.events.TimerEvent;
     import flash.events.IOErrorEvent;
     import flash.utils.Timer;
+    import flash.system.Security;
 
+    /**
+     * How to use:
+     *   // JSONPLoader.allowCurrentDomain(); // Allow show browsing url's domain.
+     *   var loader:JSONPLoader = new JSONPLoader();
+     *   loader.addEventListener(Event.COMPLETE, function(e:Event):void {
+     *       log(e.target.data);
+     *   });
+     *   loader.addEventListener(IOErrorEvent.IO_ERROR, function(e:IOErrorEvent):void {
+     *       log('error!');
+     *   });
+     *   // loader.callbackQueryName = 'callback'; // Default name is "callback"
+     *   loader.load('http://del.icio.us/feeds/json/url/data?hash=46efc577b7ddef30d1c6fd13311b371e');
+     */
     public class JSONPLoader extends EventDispatcher {
-        public static var callbackObjects:Object = {};
-
-        public var url:String;
         public var encoding:String = 'UTF-8';
         public var callbackQueryName:String = 'callback';
         public var data:Object;
         public var timeout:Number = 30;
+        protected var nowCallbackFuncName:String;
 
+        public static var callbackObjects:Object = {};
         public static var inited:Boolean = false;
 
-        public function JSONPLoader(url:String = ''):void {
+        public function JSONPLoader(url:String = undefined):void {
             if (!ExternalInterface.available) throw (new IllegalOperationError('ExternalInterface.available should be true.'));
             if (!inited) init();
-
-            this.url = url;
+            if (url) load(url);
         }
 
-        private function init():void {
+        public static function allowCurrentDomain():void {
+            var domain:String = execExternalInterface('return location.host.split(":", 2)[0]');
+            Security.allowDomain(domain);
+        }
+
+        protected static function init():void {
             inited = true;
             ExternalInterface.addCallback('jsonpCallbacks', jsonpCallbacks);
 
         }
 
-        public function load(url:String = undefined):void {
-            url ||= this.url;
+        public function load(url:String):void {
+            if (observeTimer) {
+                jsRemoveCallback(nowCallbackFuncName);
+                clearObserveTimer();
+            }
             var callbackFuncName:String = '_' + (new Date()).getTime().toString();
+            nowCallbackFuncName = callbackFuncName;
             jsAddCallback(callbackFuncName);
 
             var loadURL:String = url + ((url.indexOf('?') > 0) ?  '&' : '?') + 
@@ -43,7 +64,7 @@ package com.rails2u.net {
             createScriptElement(loadURL);
         }
 
-        private function createScriptElement(loadURL:String):void {
+        protected function createScriptElement(loadURL:String):void {
             var js:Array = [];
             js.push("var script = document.createElement('script');");
             js.push("script.charset = '" + encoding + "';");
@@ -53,49 +74,57 @@ package com.rails2u.net {
             execExternalInterface(js.join("\n"));
         }
 
-        private static function jsonpCallbacks(callbackFuncName:String, obj:Object):void {
+        protected static function jsonpCallbacks(callbackFuncName:String, obj:Object):void {
             var target:JSONPLoader = callbackObjects[callbackFuncName] as JSONPLoader;
             if (target) {
                 target.data = obj;
                 target.dispatchEvent(new Event(Event.COMPLETE));
+                target.clearObserveTimer();
+            } else {
+                new Error("Don't found callback(" + callbackFuncName + ").");
             }
         }
 
-        private static function execExternalInterface(cmd:String):* {
+        protected static function execExternalInterface(cmd:String):* {
             cmd = "(function() {" + cmd + ";})";
             return ExternalInterface.call(cmd);
         }
 
-        private function jsAddCallback(callbackFuncName:String):void {
+        protected function jsAddCallback(callbackFuncName:String):void {
             var js:String = 'if (!window.as3callbacks) window.as3callbacks = {};window.as3callbacks["' + callbackFuncName + 
-                '"] = function(obj) { document.getElementById("' + 
-                ExternalInterface.objectID + '").jsonpCallbacks("' + callbackFuncName + '",obj) };';
+                '"] = function(obj) { document.getElementsByName("' + 
+                ExternalInterface.objectID + '")[0].jsonpCallbacks("' + callbackFuncName + '",obj) };';
             execExternalInterface(js);
         }
 
-        private function jsRemoveCallback(callbackFuncName:String):void {
+        protected function jsRemoveCallback(callbackFuncName:String):void {
             var js:String = 'if (window.as3callbacks) window.as3callbacks["' + callbackFuncName + '"] = function() {};';
             execExternalInterface(js);
         }
 
-        private var observeTimer:Timer;
-        private function observeTimeout(sec:Number, callbackFuncName:String):void
+        protected var observeTimer:Timer;
+        protected function observeTimeout(sec:Number, callbackFuncName:String):void
         {
             observeTimer = new Timer(sec * 1000, 1);
             observeTimer.addEventListener(TimerEvent.TIMER, timeoutErrorHandlerBind(callbackFuncName), false, 1, true);
             observeTimer.start();
         }
 
-        private function timeoutErrorHandlerBind(callbackFuncName:String):Function {
+        protected function timeoutErrorHandlerBind(callbackFuncName:String):Function {
             return function(e:TimerEvent):void {
                 jsRemoveCallback(callbackFuncName);
                 timeoutErrorHandler(e);
             }
         }
 
-        private function timeoutErrorHandler(e:TimerEvent):void 
+        protected function timeoutErrorHandler(e:TimerEvent):void 
         {
             dispatchEvent(new IOErrorEvent(IOErrorEvent.IO_ERROR, false, false, 'Request timeout'));
+            clearObserveTimer();
+        }
+
+        // FIXME: Public namespace should be protected.
+        public function clearObserveTimer():void {
             observeTimer.removeEventListener(TimerEvent.TIMER, timeoutErrorHandler);
             observeTimer.stop();
             observeTimer = null;
