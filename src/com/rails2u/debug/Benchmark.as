@@ -28,7 +28,14 @@ package com.rails2u.debug {
 
         public static function benchmark(name:String, callback:Function, bindObject:Object = null):Number {
             start(name);
-            callback.apply(bindObject);
+            callback.call(bindObject);
+            return end(name);
+        }
+
+        public static function loop(name:String, callback:Function, bindObject:Object = null, times:uint = 100):Number {
+            start(name);
+            for (var i:uint = 0; i < times; i++) 
+                callback.call(bindObject);
             return end(name);
         }
 
