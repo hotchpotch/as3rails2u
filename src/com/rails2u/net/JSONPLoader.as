@@ -21,6 +21,7 @@ package com.rails2u.net {
      *   // loader.callbackQueryName = 'callback'; // Default name is "callback"
      *   loader.load('http://del.icio.us/feeds/json/url/data?hash=46efc577b7ddef30d1c6fd13311b371e');
      */
+
     public class JSONPLoader extends EventDispatcher {
         public var encoding:String = 'UTF-8';
         public var callbackQueryName:String = 'callback';

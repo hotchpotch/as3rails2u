@@ -2,7 +2,7 @@ package com.rails2u.debug {
     import flash.events.IEventDispatcher;
     import com.rails2u.utils.Reflection;
     import flash.events.Event;
-    import mx.logging.Log;
+
     public class DebugWatcher {
         public static function monitorEvents(target:IEventDispatcher, ... arg):void {
             if ( arg.length > 0 ) {

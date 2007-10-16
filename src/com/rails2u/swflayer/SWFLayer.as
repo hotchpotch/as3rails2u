@@ -15,14 +15,14 @@ package com.rails2u.swflayer {
 
             // defineJSFuncitons();
 
-            var x:String = getProperty('offsetTop');
-            var y:String = getProperty('offsetLeft');
+            //var x:String = getProperty('offsetTop');
+            //var y:String = getProperty('offsetLeft');
             _style = new SWFStyle(this);
             //this.x = Number(x);
             //this.y = Number(y);
             //this.height = this.clientHeight;
             //this.width = this.clientWidth;
-            if (_style.position != 'absolute') _style.position = 'absolute';
+            //if (_style.position != 'absolute') _style.position = 'absolute';
         }
 
         public function get style():SWFStyle {
