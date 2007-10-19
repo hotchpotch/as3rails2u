@@ -1,6 +1,7 @@
 package com.rails2u.utils
 {
     import flash.utils.getQualifiedClassName;
+    import flash.utils.ByteArray;
 
     public class ObjectInspecter
     {
@@ -9,6 +10,13 @@ package com.rails2u.utils
          */
         public static function inspect(... args):String {
             return inspectImpl(args, false);
+        }
+
+        public static function seriarize(arg:Object):Object {
+            var b:ByteArray = new ByteArray();
+            b.writeObject(arg);
+            b.position = 0;
+            return b.readObject();
         }
 
         internal static function inspectImpl(arg:*, bracket:Boolean = true):String {
