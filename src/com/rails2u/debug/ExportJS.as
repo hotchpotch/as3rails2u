@@ -18,27 +18,39 @@ package com.rails2u.debug {
             inited = true;
         }
             
-        public static function updateProperty(jsName:String, chainProperties:Array, value:Object):void {
+        public static function updateProperty(jsName:String, chainProperties:Array, value:Object):Boolean {
             var obj:Object = objects[jsName];
             while (chainProperties.length > 1) {
                 var prop:String = chainProperties.shift();
                 obj = obj[prop];
             }
-            obj[chainProperties.shift()] = value;
+            try {
+                obj[chainProperties.shift()] = value;
+            } catch(e:Error) { 
+                ExternalInterface.call('console.error', e.message);
+                return false;
+            }
+            return true;
         }
 
-        public static function callMethod(jsName:String, chainProperties:Array, args:Object):void {
+        public static function callMethod(jsName:String, chainProperties:Array, args:Object):* {
             var obj:Object = objects[jsName];
             while (chainProperties.length > 1) {
                 var prop:String = chainProperties.shift();
                 obj = obj[prop];
             }
             var func:Function = obj[chainProperties.shift()] as Function;
-            if (func is Function) func.apply(obj, args);
+
+            try {
+                if (func is Function) return func.apply(obj, args);
+            } catch(e:Error) { 
+                ExternalInterface.call('console.error', e.message);
+            }
         }
 
         public static function reloadObject(jsName:String) {
             export(objects[jsName], jsName);
+            ExternalInterface.call('console.info', 'reloaded: ' + jsName);
         }
         
         private static var cNum:uint = 0;
@@ -85,8 +97,11 @@ package com.rails2u.debug {
                             obj.__defineSetter__(i, 
                                 (function(attrName) {
                                     return function(val) { 
-                                        swfObject.updateProperty(jsName, [].concat(parentProperties).concat(attrName), val);
-                                        return this.__tmpProperties__[attrName] = val;
+                                        if (swfObject.updateProperty(jsName, [].concat(parentProperties).concat(attrName), val)) {
+                                            return this.__tmpProperties__[attrName] = val;
+                                        } else {
+                                            return this.__tmpProperties__[attrName];
+                                        }
                                     }
                                 })(i)
                             );
@@ -99,6 +114,8 @@ package com.rails2u.debug {
                     defineAttr(target, []);
 
                     target.__reload = function() { return swfObject.reloadObject(jsName) };
+                    if (!target.hasOwnProperty('reload')) target.reload = target.__reload;
+
                     target.toString = function() { return klassName };
                     window[jsName] = target;
                 ;})
