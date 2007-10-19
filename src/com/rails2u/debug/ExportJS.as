@@ -14,11 +14,12 @@ package com.rails2u.debug {
 
             ExternalInterface.addCallback('updateProperty', updateProperty);
             ExternalInterface.addCallback('callMethod', callMethod);
+            ExternalInterface.addCallback('reloadObject', reloadObject);
             inited = true;
         }
             
-        public static function updateProperty(target:Object, chainProperties:Array, value:Object):void {
-            var obj:Object = objects[target];
+        public static function updateProperty(jsName:String, chainProperties:Array, value:Object):void {
+            var obj:Object = objects[jsName];
             while (chainProperties.length > 1) {
                 var prop:String = chainProperties.shift();
                 obj = obj[prop];
@@ -26,14 +27,18 @@ package com.rails2u.debug {
             obj[chainProperties.shift()] = value;
         }
 
-        public static function callMethod(target:Object, chainProperties:Array, args:Object):void {
-            var obj:Object = objects[target];
+        public static function callMethod(jsName:String, chainProperties:Array, args:Object):void {
+            var obj:Object = objects[jsName];
             while (chainProperties.length > 1) {
                 var prop:String = chainProperties.shift();
                 obj = obj[prop];
             }
             var func:Function = obj[chainProperties.shift()] as Function;
             if (func is Function) func.apply(obj, args);
+        }
+
+        public static function reloadObject(jsName:String) {
+            export(objects[jsName], jsName);
         }
         
         private static var cNum:uint = 0;
@@ -44,7 +49,7 @@ package com.rails2u.debug {
         public static function export(targetObject:*, jsName:String = undefined):String {
             init();
 
-            if (!jsName) jsName = '_' + nonameCounter();
+            if (!jsName) jsName = '__swf__' + nonameCounter();
 
             var b:ByteArray = new ByteArray();
             b.writeObject(targetObject);
@@ -58,6 +63,8 @@ package com.rails2u.debug {
             objects[jsName] = targetObject;
             ExternalInterface.call(<><![CDATA[ 
                 (function(target, objectID, jsName, klassName) {
+                    var swfObject = document.getElementsByName(objectID)[0];
+
                     var defineAttr = function(obj, parentProperties) {
                         var tmp = {};
                         for (var i in obj) {
@@ -78,18 +85,20 @@ package com.rails2u.debug {
                             obj.__defineSetter__(i, 
                                 (function(attrName) {
                                     return function(val) { 
-                                        document.getElementsByName(objectID)[0].updateProperty(jsName, [].concat(parentProperties).concat(attrName), val);
+                                        swfObject.updateProperty(jsName, [].concat(parentProperties).concat(attrName), val);
                                         return this.__tmpProperties__[attrName] = val;
                                     }
                                 })(i)
                             );
                         }
                         obj.__noSuchMethod__ = function(attrName, args) {
-                            document.getElementsByName(objectID)[0].callMethod(jsName, [].concat(parentProperties).concat(attrName), args);
+                            swfObject.callMethod(jsName, [].concat(parentProperties).concat(attrName), args);
                         }
                         obj.__tmpProperties__ = tmp;
                     }
                     defineAttr(target, []);
+
+                    target.__reload = function() { return swfObject.reloadObject(jsName) };
                     target.toString = function() { return klassName };
                     window[jsName] = target;
                 ;})
