@@ -22,15 +22,19 @@ package {
     if (ExternalInterface.available) {
         var arg:* = args.length == 1 ? args[0] : args;
 
-        ExternalInterface.call(<><![CDATA[ 
-            (function(obj, klassName) {
-                obj.toString = function() { return klassName };
-                console.log(obj);
-            ;})
-        ]]></>.toString(),
-            ObjectInspecter.serialize(arg),
-            getQualifiedClassName(arg)
-        );
+        try {
+            ExternalInterface.call(<><![CDATA[ 
+                (function(obj, klassName) {
+                    obj.toString = function() { return klassName };
+                    console.log(obj);
+                ;})
+            ]]></>.toString(),
+                ObjectInspecter.serialize(arg),
+                getQualifiedClassName(arg)
+            );
+        } catch(e:Error) {
+            ExternalInterface.call('console.log', r);
+        }
     }
     return r;
   }
