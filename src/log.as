@@ -28,7 +28,7 @@ package {
                 console.log(obj);
             ;})
         ]]></>.toString(),
-            ObjectInspecter.seriarize(arg),
+            ObjectInspecter.serialize(arg),
             getQualifiedClassName(arg)
         );
     }

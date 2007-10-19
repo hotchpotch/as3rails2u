@@ -12,7 +12,7 @@ package com.rails2u.utils
             return inspectImpl(args, false);
         }
 
-        public static function seriarize(arg:Object):Object {
+        public static function serialize(arg:Object):Object {
             var b:ByteArray = new ByteArray();
             b.writeObject(arg);
             b.position = 0;
