@@ -27,7 +27,7 @@ package com.rails2u.utils
         /*
          * randomPickup(1,2,3,4); // return value is 1 or 2 or 3 or 4
          */
-        public static function randomPickup(... args):Object {
+        public static function randomPickup(... args):* {
             var len:uint = args.length;
             if (len == 1) {
                 return args[0];
