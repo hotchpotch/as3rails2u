@@ -9,6 +9,7 @@ package com.rails2u.layout {
         public var data:Object;
 
         public function Cell(layout:GridLayout, rowIndex:uint, columnIndex:uint) {
+            data = {};
             this._layout = layout;
             this._rowIndex = rowIndex;
             this._columnIndex = columnIndex;

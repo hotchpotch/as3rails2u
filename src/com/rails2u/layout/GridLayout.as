@@ -124,6 +124,14 @@ package com.rails2u.layout {
             return _cells[r][c];
         }
 
+        public function getCellByPosition(xPos:Number, yPos:Number):Cell {
+            if (xPos < 0 || yPos < 0 || xPos > width || yPos > height) {
+                return null;
+            } else {
+               return cell( Math.floor(xPos / cellWidth), Math.floor(yPos / cellHeight));
+            }
+        }
+
         public function cells(hasDisplayObjectOnly:Boolean = false):Array {
             var res:Array = [];
             for (var r:uint = 0; r < rowCount; r++) {
