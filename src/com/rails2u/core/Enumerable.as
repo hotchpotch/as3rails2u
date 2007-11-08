@@ -1,12 +1,19 @@
 package com.rails2u.core {
     public class Enumerable {
+        public static function implementation(klass:Class):void {
+            klass.prototype.zip = function(...args):Enumerable { 
+                return zip.apply(null, [klass].concat(args));
+            };
+        }
+
         public static function zip(t:*, ...args):Enumerator {
-           var ary:Array = take(t);
+           log(1, args, 4);
+           var ary:Array = getValues(t);
            var res:Array = [];
            var num:uint = Math.min.apply(null,
                [ary.length].concat(args.map(function(e:*, ...a):Number { return e.length })));
 
-           args = args.map(function(e:*, ...a):Array { return take(e, num) });
+           args = args.map(function(e:*, ...a):Array { return getValues(e, num) });
            for (var i:uint = 0; i < num; i++) {
                var r:Array = [ary[i]];
                for each(var a:Array in args) {
@@ -18,7 +25,7 @@ package com.rails2u.core {
         }
 
         public static function cycle(t:*):Enumerator {
-           var ary:Array = take(t);
+           var ary:Array = getValues(t);
            return new Enumerator(ary, iCycle, valReturn(true), valReturn(Infinity));
         }
 
@@ -35,7 +42,11 @@ package com.rails2u.core {
             }
         }
 
-        public static function take(t:*, maxValue:Number = Infinity):Array {
+        public static function take(t:*, maxValue:Number = Infinity):Enumerator {
+            return new Enumerator(getValues(t, maxValue));
+        }
+
+        private static function getValues(t:*, maxValue:Number = Infinity):Array {
             var res:Array = [];
             try {
                 if (t is Array) {

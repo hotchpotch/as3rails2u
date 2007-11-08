@@ -3,9 +3,13 @@ package com.rails2u.record {
     import flash.events.MouseEvent;
     import flash.events.IEventDispatcher;
     import flash.utils.Dictionary;
+    import flash.utils.getTimer;
+    import flash.events.Event;
+    import flash.utils.ByteArray;
 
     public class MouseRecorder {
         public static const MOUSE_EVENT_NAMES:Array = [
+           MouseEvent.DOUBLE_CLICK,
            MouseEvent.MOUSE_DOWN,
            MouseEvent.MOUSE_MOVE,
            MouseEvent.MOUSE_UP,
@@ -21,9 +25,10 @@ package com.rails2u.record {
 
         protected var _canvas:InteractiveObject;
         protected var _eventNames:Array = [];
+        protected var records:Array = [];
         public function MouseRecorder(canvas:InteractiveObject) {
             _canvas = canvas;
-            eventNames = MOUSE_EVENT_NAMES.splice(0);
+            setEvents(MOUSE_EVENT_NAMES.splice(0));
         }
 
         protected var _started:Boolean = false;
@@ -41,6 +46,7 @@ package com.rails2u.record {
         public static const BUBBLES_BOTH:uint = 0;
         protected var _recordBubblesType:uint = BUBBLES_TRUE;
 
+        // ToDo
         public function set recordBubblesType(u:uint):void {
             _recordBubblesType = u;
         }
@@ -53,7 +59,7 @@ package com.rails2u.record {
             return _eventNames;
         }
 
-        public function set eventNames(n:Array):void {
+        public function setEvents(n:Array):void {
             _recordTypes = new Dictionary();
             for each(var evName:String in n) {
                 _recordTypes[evName] = true;
@@ -77,6 +83,11 @@ package com.rails2u.record {
             return false;
         }
 
+        protected var _startRecordTime:uint;
+        public function get startRecordTime():uint {
+            return _startRecordTime;
+        }
+
         public function start():Boolean {
             if (_started) {
                 return false;
@@ -97,17 +108,30 @@ package com.rails2u.record {
             }
         }
 
+        // ToDo
+        public function pause():Boolean {
+            return false;
+        }
+
+        public function getRecords():ByteArray {
+            var b:ByteArray = new ByteArray;
+            b.writeObject(records);
+            b.position = 0;
+            b.compress();
+            return b;
+        }
+
         protected function addHandlers(t:IEventDispatcher, ens:Array):void {
             for each(var evName:String in ens) {
                 t.addEventListener(evName, recordHandler, false, priority, useWeakReference);
-                t.addEventListener(evName, recordHandler, true, priority, useWeakReference);
+                //t.addEventListener(evName, recordHandler, true, priority, useWeakReference);
             }
         }
 
         protected function removeHandlers(t:IEventDispatcher, ens:Array):void { 
             for each(var evName:String in ens) {
                 t.removeEventListener(evName, recordHandler, false);
-                t.removeEventListener(evName, recordHandler, true);
+                //t.removeEventListener(evName, recordHandler, true);
             }
         }
 
@@ -118,6 +142,21 @@ package com.rails2u.record {
                 (e.bubbles == true ? BUBBLES_TRUE : BUBBLES_FALSE) != recordBubblesType
                 )
             ) return;
+
+            _startRecordTime ||= getTimer();
+            records.push([getTimer() - startRecordTime, event2object(e)]);
+        }
+
+        protected var baTmp:ByteArray;
+        protected var objTmp:Object;
+        protected function event2object(e:MouseEvent):Object {
+            baTmp = new ByteArray();
+            baTmp.writeObject(e);
+            baTmp.position = 0;
+            objTmp = baTmp.readObject();
+            objTmp.type = e.type;
+            if (e.currentTarget) objTmp.name = e.currentTarget.name;
+            return objTmp;
         }
     }
 }

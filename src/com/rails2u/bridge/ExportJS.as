@@ -128,6 +128,7 @@ package com.rails2u.bridge {
             ExternalInterface.addCallback('updateProperty', updateProperty);
             ExternalInterface.addCallback('callMethod', callMethod);
             ExternalInterface.addCallback('reloadObject', reloadObject);
+            ExternalInterface.call('function() { window.__as3__ = []}');
             inited = true;
         }
             
