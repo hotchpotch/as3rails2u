@@ -12,12 +12,12 @@ package com.rails2u.tracer {
             _repeat = __repeat;
         }
         
-        private var _distance:uint = 10;
-        public function get distance():uint {
-            return _distance;
+        private var _tracePoints:uint = 10;
+        public function get tracePoints():uint {
+            return _tracePoints;
         }
-        public function set distance(__distance:uint):void {
-            _distance = __distance;
+        public function set tracePoints(__tracePoints:uint):void {
+            _tracePoints = __tracePoints;
         }
 
         private var _started:Boolean = false;
@@ -38,6 +38,8 @@ package com.rails2u.tracer {
         
         protected var times:uint = 0;
         public function start():void {
+            if (started) return;
+
             started = true;
             while (repeat == 0 || repeatCount < repeat) {
                 run();
@@ -48,7 +50,7 @@ package com.rails2u.tracer {
 
         protected function run():void {
             times = 0;
-            while(started && times < distance) {
+            while(started && times < tracePoints) {
                 times++;
                 dispatchEvent(getTraceEvent());
             }
@@ -64,20 +66,22 @@ package com.rails2u.tracer {
 
         private var _matrix:Matrix = new Matrix;
         public function get matrix():Matrix {
-            return _matrix;
+            return _matrix.clone();
         }
         
         public function set matrix(__matrix:Matrix):void {
-            _matrix = __matrix;
+            _matrix = __matrix.clone();
         }
-        
+
+        public function reset():void {
+            times = 0;
+            repeatCount = 0;
+        }
 
         /*
          * ToDo
          * - wait (delay)
-         * - matrix
          * - next (iterator)
-         *
          */
     }
 }
