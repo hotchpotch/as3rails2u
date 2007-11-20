@@ -88,5 +88,21 @@ package com.rails2u.utils {
         public static function simpleLineStyle(graphics:Graphics):void {
             graphics.lineStyle(0, 0xEEEEEE);
         }
+
+        public static function drawQuadraticBezier(graphics:Graphics, x0:Number, y0:Number, x1:Number, y1:Number, x2:Number, y2:Number, x3:Number, y3:Number, points:uint = 20):void {
+            graphics.moveTo(x0, y0);
+            var t:Number;
+            for (var i:uint = 1; i < points; i++) {
+                t = 1 / points * i;
+                graphics.lineTo(
+                    MathUtil.bezierN(t,[x0,x1,x2,x3]),
+                    MathUtil.bezierN(t,[y0,y1,y2,y3])
+                );
+            }
+            graphics.lineTo(
+                MathUtil.bezierN(1,[x0,x1,x2,x3]),
+                MathUtil.bezierN(1,[y0,y1,y2,y3])
+            );
+        }
     }
 }

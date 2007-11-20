@@ -87,7 +87,7 @@ package com.rails2u.typofy {
         }
 
         public var bitmapFont:Bitmap;
-        public function replaceBitmap(blurX:Number = 2, blurY:Number = 2, blurQuality:uint = BitmapFilterQuality.HIGH):void {
+        public function replaceBitmap(blurX:Number = 2, blurY:Number = 2, blurQuality:uint = 3):void {
             if (!bitmapFont) {
                 renderBitmapFont(blurX, blurY, blurQuality);
                 textField.visible = false;
@@ -130,7 +130,7 @@ package com.rails2u.typofy {
         public static var AA_MAX_SCALE:Number = 3;
         // Device font apply Anti-Alias tips by F-SITE.
         // http://f-site.org/articles/2007/04/08165536.html
-        public static function getAAText(textField:TextField, blurX:Number = 2, blurY:Number = 2, blurQuality:uint = BitmapFilterQuality.HIGH):BitmapData {
+        public static function getAAText(textField:TextField, blurX:Number = 2, blurY:Number = 2, blurQuality:uint = 2):BitmapData {
             var aaWidth:Number  = textField.textWidth + AA_MARGIN;
             var aaHeight:Number = textField.textHeight + AA_MARGIN;
             var aaScale:Number = Math.min(AA_MAX_SCALE, Math.min(AA_BMP_MAX / aaWidth, AA_BMP_MAX / aaHeight));

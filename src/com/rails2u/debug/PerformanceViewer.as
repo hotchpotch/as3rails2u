@@ -47,7 +47,7 @@ package com.rails2u.debug {
         private var _fpss:Array = [];
         private function refresh(event:Event):void {
              var time:int = getTimer();
-             if (time - lastTimeSecond > 1000) {
+             if (time - lastTimeSecond > 200) {
                   var _fps:Number = 0;
                   _fpss.forEach(function(v:Number, ... args):void { _fps += v });
                   _fps /= _fpss.length;

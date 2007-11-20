@@ -6,6 +6,10 @@ package com.rails2u.tracer {
             return _length;
         }
         
+        public function set length(__length:Number):void {
+            _length = __length;
+        }
+        
         public function LineTracer(length:Number) {
             super();
             this._length = length;

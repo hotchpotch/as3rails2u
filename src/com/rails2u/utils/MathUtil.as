@@ -64,6 +64,9 @@ package com.rails2u.utils
         public static function bezier3(t:Number, x0:Number, x1:Number, x2:Number, x3:Number):Number {
              return x0 * Math.pow(1-t, 3) + 3 * x1 * t *Math.pow(1-t, 2) + 3 * x2 * Math.pow(t, 2) * 1-t + x3 * Math.pow(t, 3);
         }
+        public static function quadraticBezier(t:Number, x0:Number, x1:Number, x2:Number, x3:Number):Number {
+             return x0 * Math.pow(1-t, 3) + 3 * x1 * t *Math.pow(1-t, 2) + 3 * x2 * Math.pow(t, 2) * 1-t + x3 * Math.pow(t, 3);
+        }
 
         public static function bezierN(t:Number, points:Array):Number {
             var res:Number = 0;
