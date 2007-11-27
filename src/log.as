@@ -1,6 +1,6 @@
 package {
   import flash.external.ExternalInterface;
-  import com.rails2u.utils.ObjectInspecter;
+  import com.rails2u.utils.ObjectUtil;
   import flash.utils.getQualifiedClassName;
 
   /**
@@ -17,7 +17,7 @@ package {
    * </listing>
    */  
   public function log(... args):String {
-    var r:String = ObjectInspecter.inspect.apply(null, args);
+    var r:String = ObjectUtil.inspect.apply(null, args);
     trace(r)
     if (ExternalInterface.available) {
         var arg:* = args.length == 1 ? args[0] : args;
@@ -29,7 +29,7 @@ package {
                     console.log(obj);
                 ;})
             ]]></>.toString(),
-                ObjectInspecter.serialize(arg),
+                ObjectUtil.clone(arg),
                 getQualifiedClassName(arg)
             );
         } catch(e:Error) {
