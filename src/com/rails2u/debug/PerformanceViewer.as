@@ -4,6 +4,7 @@ package com.rails2u.debug {
     import flash.text.TextFormat;
     import flash.utils.getTimer;
     import flash.system.System;
+    import flash.utils.Timer;
 
     /**
     * PerformanceViewer
@@ -21,9 +22,13 @@ package com.rails2u.debug {
     */
     public class PerformanceViewer extends TextField {
         private var lastTime:uint;
-        private var lastTimeSecond:uint;
+        private var _fps:Number = 60;
+        public function get fps():Number {
+            return _fps;
+        }
         
-        public function PerformanceViewer(color:uint = 0xFFFFFF) {
+        private var timer:Timer;
+        public function PerformanceViewer(color:uint = 0xFFFFFF, delay:Number = 200) {
             super();
             
             visible = false;
@@ -40,24 +45,29 @@ package com.rails2u.debug {
             defaultTextFormat = format;
             
             lastTime = getTimer();
-            lastTimeSecond = lastTime;
-            addEventListener(Event.ENTER_FRAME, refresh);
+
+            timer = new Timer(delay);
+            timer.addEventListener('timer', render);
+            timer.start();
+            addEventListener(Event.ENTER_FRAME, countHandler);
         }
         
         private var _fpss:Array = [];
-        private function refresh(event:Event):void {
+        private function countHandler(e:Event):void {
              var time:int = getTimer();
-             if (time - lastTimeSecond > 200) {
-                  var _fps:Number = 0;
-                  _fpss.forEach(function(v:Number, ... args):void { _fps += v });
-                  _fps /= _fpss.length;
-                  _fpss = [];
-                  text = String(1000 / (_fps)).substring(0, 6) + ' FPS' + "\n" +  Number(System.totalMemory) / 1000 + " KB";
-                  lastTimeSecond = time;
-             } else {
-                 _fpss.push(time - lastTime);
-             }
+             _fpss.push(time - lastTime);
              lastTime = time;
+        }
+
+        private function render(e:Event):void {
+            _fps = 0;
+            for each(var v:Number in _fpss) {
+                _fps += v;
+            }
+            _fps /= _fpss.length;
+            var rCount:int = _fpss.length;
+            _fpss = [];
+            text = String(1000 / (_fps)).substring(0, 6) + ' FPS' + "\n" +  Number(System.totalMemory) / 1000 + " KB";
         }
 
         private function init():void {

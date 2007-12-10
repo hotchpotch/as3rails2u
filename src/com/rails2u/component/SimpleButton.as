@@ -14,7 +14,7 @@ package com.rails2u.component {
         public var defaultColorTransform:ColorTransform;
         public var tmpColorTransform:ColorTransform;
         public var openURL:String;
-        public var targetURLType:String = 'blank';
+        public var targetURLType:String = null;
         
         protected var _textField:TextField;
         

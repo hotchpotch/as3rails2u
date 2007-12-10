@@ -40,11 +40,11 @@ package com.rails2u.net {
                 // IE
                 var jsURL:String = 'javascript:(function(){window.open("' + url + '", "' + windows + '")})();'
                 var req:URLRequest = new URLRequest(jsURL);
-                flash.net.navigateToURL(req, windows);
+                flash.net.navigateToURL(req, '_self');
             }
         } else {
             // Opera, Safari
-            flash.net.navigateToURL(request, windows);
+            flash.net.navigateToURL(request, null);
         }
     }
 }

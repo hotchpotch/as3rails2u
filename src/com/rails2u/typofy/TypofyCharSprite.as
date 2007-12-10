@@ -94,7 +94,7 @@ package com.rails2u.typofy {
             }
         }
 
-        private function renderBitmapFont(blurX:Number = 2, blurY:Number = 2, blurQuality:uint = BitmapFilterQuality.HIGH):void {
+        private function renderBitmapFont(blurX:Number = 2, blurY:Number = 2, blurQuality:uint = 1):void {
             if (bitmapFont) {
                 removeChild(bitmapFont);
             }
