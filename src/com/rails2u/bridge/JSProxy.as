@@ -72,7 +72,12 @@ package com.rails2u.bridge {
         }
 
         flash_proxy override function setProperty(name:*, value:*):void {
-            callJSSetProperty(newStack(name), value);
+            var $name:* = $check(name);
+            if ($name) {
+                callJSSetProperty(newStack($name), value);
+            } else {
+                callJSSetProperty(newStack(name), value);
+            }
         }
 
         flash_proxy override function deleteProperty(name:*):Boolean {
@@ -86,9 +91,9 @@ package com.rails2u.bridge {
             return '[JSProxy] ' + cmd + ' :: ' + args.join(', ');
         }
 
-        flash_proxy function callJSSetProperty(stack:Array, value:*):* {
+        flash_proxy function callJSSetProperty(stack:Array, value:*):void {
             if (!ExternalInterface.available) 
-                return null;
+                return;
 
             var res:Array = createCommand(stack);
             var cmd:String = res[0];
@@ -96,9 +101,9 @@ package com.rails2u.bridge {
             args.push(value);
             var argsString:String = createArgsString(args.length);
 
-            cmd = "(function(" + argsString + ") {return " + cmd + " = _" + (args.length - 1).toString() + ";})";
+            cmd = "(function(" + argsString + ") {setTimeout(function(){try{" + cmd + " = _" + (args.length - 1).toString() + "}catch(e){};}, 0);})";
             proxyLogger(cmd);
-            return ExternalInterface.call.apply(null, [cmd].concat(args));
+            ExternalInterface.call.apply(null, [cmd].concat(args));
         }
 
         flash_proxy function callJS(stack:Array):* {
