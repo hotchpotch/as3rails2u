@@ -9,9 +9,11 @@ package com.rails2u.bridge {
         public static var proxyLogger:Function = function(...args):void {};
         private var _stack:Array;
         private var _nextCallIsstack:Boolean = false;
+        public var forceAsync:Boolean = false;
 
-        public function JSProxy(stack:Array = null) {
+        public function JSProxy(stack:Array = null, forceAsync:Boolean = false) {
             _stack = stack || [];
+            this.forceAsync = forceAsync;
         }
 
         public function get proxy():JSProxy {
@@ -27,7 +29,7 @@ package com.rails2u.bridge {
             if ($name) {
                 return callJS(newStack($name, args));
             } else {
-                return new JSProxy(newStack(name, args));
+                return new JSProxy(newStack(name, args), forceAsync);
             }
         }
 
@@ -49,7 +51,7 @@ package com.rails2u.bridge {
             if ($name) {
                 return callJS(newStack($name));
             } else {
-                return new JSProxy(newStack(name));
+                return new JSProxy(newStack(name), forceAsync);
             }
         }
 
@@ -101,9 +103,14 @@ package com.rails2u.bridge {
             args.push(value);
             var argsString:String = createArgsString(args.length);
 
-            cmd = "(function(" + argsString + ") {setTimeout(function(){try{" + cmd + " = _" + (args.length - 1).toString() + "}catch(e){};}, 0);})";
+            //cmd = "(function(" + argsString + ") {setTimeout(function(){try{" + cmd + " = _" + (args.length - 1).toString() + "}catch(e){};}, 0);})";
+            cmd = "(function(" + argsString + ") {" + asyncFunc(cmd + " = _" + (args.length - 1).toString()) + ";})";
             proxyLogger(cmd);
             ExternalInterface.call.apply(null, [cmd].concat(args));
+        }
+
+        flash_proxy function asyncFunc(cmd:String):String {
+            return "setTimeout(function(){ try{" + cmd + "} catch(e) {};}, 0)";
         }
 
         flash_proxy function callJS(stack:Array):* {
@@ -114,17 +121,21 @@ package com.rails2u.bridge {
             var cmd:String = res[0];
             var args:Array = res[1];
             var argsString:String = createArgsString(args.length);
+            var result:*;
+
+            if (forceAsync) cmd = asyncFunc(cmd);
 
             if (args.length > 0) {
                 cmd = "(function(" + argsString + ") {return " + cmd + ";})";
                 proxyLogger(cmd);
                 proxyLogger(args);
-                return ExternalInterface.call.apply(null, [cmd].concat(args));
+                result = ExternalInterface.call.apply(null, [cmd].concat(args));
             } else {
                 cmd = "(function() {return " + cmd + ";})";
                 proxyLogger(cmd);
-                return ExternalInterface.call(cmd);
+                result = ExternalInterface.call(cmd);
             }
+            return forceAsync ? null : result;
         }
 
         flash_proxy function createArgsString(len:uint):String {
