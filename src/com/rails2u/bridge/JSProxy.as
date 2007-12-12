@@ -14,11 +14,6 @@ package com.rails2u.bridge {
             _stack = stack || [];
         }
 
-        public function get _():JSProxy {
-            _nextCallIsstack = true;
-            return this;
-        }
-
         public function get proxy():JSProxy {
             return getProperty('proxy');
         }
@@ -28,28 +23,43 @@ package com.rails2u.bridge {
         }
 
         flash_proxy override function callProperty(name:*, ...args):* {
-            if (_nextCallIsstack) {
-                _nextCallIsstack = false;
-                _stack.push([name, args]);
-                return this;
+            var $name:* = $check(name);
+            if ($name) {
+                return callJS(newStack($name, args));
             } else {
-                return callJS(newStack.apply(null, [name].concat(args)));
+                return new JSProxy(newStack(name, args));
+            }
+        }
+
+        flash_proxy function $check(name:*):* {
+            if (name.toString().indexOf('$') == 0 && name.toString().length >= 2) {
+                var r:String = name.toString().replace(/^\$+/, '');
+                if (name is QName) {
+                    return new QName(name.uri, r);
+                } else {
+                    return r;
+                }
+            } else {
+                return '';
             }
         }
 
         flash_proxy override function getProperty(name:*):* {
-            _nextCallIsstack = false;
-            return new JSProxy(newStack(name));
+            var $name:* = $check(name);
+            if ($name) {
+                return callJS(newStack($name));
+            } else {
+                return new JSProxy(newStack(name));
+            }
         }
 
         flash_proxy override function getDescendants(name:*):* {
-            _nextCallIsstack = false;
             return callJS(newStack(name));
         }
 
-        flash_proxy function newStack(name:*, ...args):Array {
+        flash_proxy function newStack(name:*, args:Array = null):Array {
             var stack:Array = _stack.slice();
-            if (args.length > 0) {
+            if (args != null) {
                 stack.push([name, args.slice()]);
             } else {
                 stack.push(name);
@@ -58,11 +68,10 @@ package com.rails2u.bridge {
         }
 
         flash_proxy override function hasProperty(name:*):Boolean {
-            return false;
+            return callJS(newStack(new QName('', name))) !== undefined;
         }
 
         flash_proxy override function setProperty(name:*, value:*):void {
-            _nextCallIsstack = false;
             callJSSetProperty(newStack(name), value);
         }
 
