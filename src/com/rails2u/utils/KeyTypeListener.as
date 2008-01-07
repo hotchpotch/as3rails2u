@@ -92,9 +92,12 @@ package com.rails2u.utils
         }
         
         protected function keyHandlerDelegeter(e:KeyboardEvent, ns:Namespace):void {
-            // log(e.currentTarget, e.target, this.currentTarget, this.obj);
             if (!(e.target == this.currentTarget || e.target == this.obj)) {
-                return;
+                if (e.target.stage && this.obj == e.target.stage) {
+                    // ...
+                } else {
+                    return;
+                }
             }
             // log(String.fromCharCode(e.charCode));
             

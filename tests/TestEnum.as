@@ -8,6 +8,9 @@ package
         public var res:String = '';
 
         public function TestEnum() {
+            Enumerable.implementation(Array);
+            var ary:Array = [1,2,3];
+
             var e1:Enumerator = new Enumerator([1,2,3]);
             equ(e1.next(), 1);
             equ(e1.hasNext(), true);
