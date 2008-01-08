@@ -2,7 +2,7 @@ package {
     import flash.display.Sprite;
     import flash.display.StageAlign;
     import flash.display.StageScaleMode;
-    import com.rails2u.math.*;
+    import com.rails2u.geom.*;
     import flash.geom.Point;
     import flash.display.Shape;
 

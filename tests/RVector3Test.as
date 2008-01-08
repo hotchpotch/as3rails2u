@@ -2,7 +2,7 @@ package {
     import flash.display.Sprite;
     import flash.display.StageAlign;
     import flash.display.StageScaleMode;
-    import com.rails2u.math.*;
+    import com.rails2u.geom.*;
 
     [SWF(frameRate=60, background=0x000000)]
     public class RVector3Test extends Sprite {

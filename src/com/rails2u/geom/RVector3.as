@@ -1,4 +1,4 @@
-package com.rails2u.math {
+package com.rails2u.geom {
     import flash.geom.Point;
     public class RVector3 {
         public static const ZERO:RVector3 = new RVector3(0, 0, 0);
