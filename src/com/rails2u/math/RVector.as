@@ -1,4 +1,5 @@
 package com.rails2u.math {
+    import flash.geom.Point;
     public class RVector {
         public static const ZERO:RVector = new RVector(0, 0);
 
@@ -43,7 +44,7 @@ package com.rails2u.math {
             return l == 0 ? ZERO.clone() : new RVector(x / l, y / l);
         }
 
-        public function innerProduct(v:RVector):Number {
+        public function dot(v:RVector):Number {
             return x * v.x + y * v.y;
         }
 
@@ -52,15 +53,36 @@ package com.rails2u.math {
         }
 
         public function degree(v:RVector):Number {
-            if ((v.y < y && v.x > x) || (v.y > y && v.x < x)) {
-                return -1 * Math.acos(innerProduct(v) / (length * v.length));
+            var n0:RVector = normalize();
+            var n1:RVector = v.normalize();
+            // (n1.y < n0.y && n1.x > n0.x) || 
+            if (n1.y > n0.y && n1.x < n0.x) {
+                return -1 * Math.acos(dot(v) / (length * v.length));
             } else {
-                return Math.acos(innerProduct(v) / (length * v.length));
+                return Math.acos(dot(v) / (length * v.length));
             }
+        }
+
+        public function angle(v:RVector):Number {
+            return degree(v) * 180/Math.PI;
         }
 
         public function toString():String {
             return 'RVector[x:' + x + ', y:' + y + ']';
+        }
+
+        public function point():Point {
+            return new Point(x, y);
+        }
+
+        public static function create(o:*):RVector {
+            if (o.hasOwnProperty('x') && o.hasOwnProperty('y')) {
+                return new RVector(o.x, o.y);
+            } else if (o is Array && o.length == 2) {
+                return new RVector(o[0], o[1]);
+            } else {
+                return null;
+            }
         }
     }
 }

@@ -2,7 +2,7 @@ package {
     import com.rails2u.utils.ObjectUtil;
 
     public class SimpleTest {
-        public var detail:Boolean = false;
+        public var verbose:Boolean = false;
 
         public var count:uint = 0;
         public var successedCount:uint = 0;
@@ -16,48 +16,48 @@ package {
 
         public function run(f:Function):void {
             try {
-                log(testName + ' test start.');
-                // log(testName + '[' + count.toString()  +' test(s)] start.');
+                showMessage(testName + ' test start.');
+                // showMessage(testName + '[' + String(count)  +' test(s)] start.');
                 f.call(this);
                 finish();
             } catch(e:Error) {
-                log(e.getStackTrace());
+                showMessage(e.getStackTrace());
             }
         }
 
         public function ok(res:*):void {
             count++;
             if (res) {
-                success(res.toString() + " is ok.");
+                success(String(res) + " is ok.");
             } else {
-                fail(res.toString() + " is not ok.");
+                fail(String(res) + " is not ok.");
             }
         }
 
         public function notOk(res:*):void {
             count++;
             if (res) {
-                success(res.toString() + " is not ok.");
+                success(String(res) + " is not ok.");
             } else {
-                fail(res.toString() + " is ok.");
+                fail(String(res) + " is ok.");
             }
         }
 
         public function opEquals(a:*, b:*):void {
             count++;
             if (a == b) {
-                success(a.toString() + " is " + b + '.');
+                success(String(a) + " is " + b + '.');
             } else {
-                fail(a.toString() + " is not " + b + '.');
+                fail(String(a) + " is not " + b + '.');
             }
         }
 
         public function notOpEquals(a:*, b:*):void {
             count++;
             if (a != b) {
-                success(a.toString() + " is not " + b + '.');
+                success(String(a) + " is not " + b + '.');
             } else {
-                fail(a.toString() + " is " + b + '.');
+                fail(String(a) + " is " + b + '.');
             }
         }
 
@@ -66,9 +66,9 @@ package {
             var _a:String = ObjectUtil.inspect(a);
             var _b:String = ObjectUtil.inspect(b);
             if (_a == _b) {
-                success(a.toString() + " is " + b + '.');
+                success(String(a) + " is " + b + '.');
             } else {
-                fail(a.toString() + " is not " + b + '.');
+                fail(String(a) + " is not " + b + '.');
             }
         }
 
@@ -77,23 +77,23 @@ package {
             var _a:String = ObjectUtil.inspect(a);
             var _b:String = ObjectUtil.inspect(b);
             if (_a != _b) {
-                success(a.toString() + " is not " + b + '.');
+                success(String(a) + " is not " + b + '.');
             } else {
-                fail(a.toString() + " is " + b + '.');
+                fail(String(a) + " is " + b + '.');
             }
         }
 
         public function finish():void {
             if (count == successedCount) {
-                log(count.toString() + " test(s) is all successed!");
+                showMessage(String(count) + " test(s) is all successed!");
             } else {
-                log(count.toString() + " test(s) running: " + failedCount.toString() +" error: " + successedCount.toString() + " success.");
+                showMessage(String(count) + " test(s) running: " + String(failedCount) +" error: " + String(successedCount) + " success.");
             }
         }
 
         protected function success(s:String):void {
             successedCount++;
-            if (detail) {
+            if (verbose) {
                 showSuccess(s);
             }
         }
@@ -106,15 +106,18 @@ package {
             showFail(
                 mes.split("\n").filter(function(i:String, ind:int, a:Array):Boolean { 
                     return i.indexOf(at) == -1 && i.indexOf(buildinCall) == -1
-                    }).join("\n")
+                }).join("\n")
             );
         }
 
-        protected function showFail(mes:String):void {
+        protected function showMessage(mes:String):void {
             log(mes);
         }
+        protected function showFail(mes:String):void {
+            showMessage(mes);
+        }
         protected function showSuccess(mes:String):void {
-            log(mes);
+            showMessage(mes);
         }
     }
 }
