@@ -50,9 +50,9 @@ package {
                 angle = (new RVector3(-1,4,2)).angle(new RVector3(3,0,5));
                 t.ok(angle > 74 && angle < 75);
 
-                //t.opEquals(Math.sqrt(2), (new RVector3(0,1)).distance(new RVector(1,0)));
-                //t.opEquals(1, (new RVector3(0,0)).distance(new RVector(1,0)));
-                //t.opEquals(0, (new RVector3(0,0)).distance(new RVector(0,0)));
+                t.equals(
+                        new RVector3(-18, -15, 16), (new RVector3(5,-6,0)).cross(new RVector3(1,2,3))
+                );
             });
         }
 

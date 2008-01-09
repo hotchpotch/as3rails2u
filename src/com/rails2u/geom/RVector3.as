@@ -7,6 +7,8 @@ package com.rails2u.geom {
         public var y:Number = 0;
         public var z:Number = 0;
 
+        public var stash:Object;
+
         public function RVector3(x:Number = 0, y:Number = 0, z:Number = 0) {
             this.x = x;
             this.y = y;
@@ -50,8 +52,8 @@ package com.rails2u.geom {
             return x * v.x + y * v.y + z * v.z;
         }
 
-        public function cross(v:RVector3):Number {
-            return 0;//x * v.x + y * v.y + z * v.z;
+        public function cross(v:RVector3):RVector3 {
+            return new RVector3(y*v.z - z*v.y, z*v.x - x*v.z, x*v.y - y*v.x);
         }
 
         public function distance(v:RVector3):Number {

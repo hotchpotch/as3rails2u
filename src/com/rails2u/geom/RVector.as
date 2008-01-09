@@ -7,6 +7,8 @@ package com.rails2u.geom {
         public var x:Number = 0;
         public var y:Number = 0;
 
+        public var stash:Object;
+
         public function RVector(x:Number = 0, y:Number = 0) {
             this.x = x;
             this.y = y;
