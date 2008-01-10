@@ -28,6 +28,7 @@ package com.rails2u.debug {
         }
         
         private var timer:Timer;
+        public var textFunction:Function;
         public function PerformanceViewer(color:uint = 0xFFFFFF, delay:Number = 200) {
             super();
             
@@ -68,6 +69,10 @@ package com.rails2u.debug {
             var rCount:int = _fpss.length;
             _fpss = [];
             text = String(1000 / (_fps)).substring(0, 6) + ' FPS' + "\n" +  Number(System.totalMemory) / 1000 + " KB";
+            if (textFunction != null) {
+                appendText("\n" + textFunction());
+            }
+            height = textHeight + defaultTextFormat.size + 5;
         }
 
         private function init():void {

@@ -98,6 +98,35 @@ package com.rails2u.geom {
             ]);
         }
 
+        public function multiply3x3(m:RMatrix4):RMatrix4 {
+            return new RMatrix4([
+                this.a00 * m.a00 + this.a01 * m.a10 + this.a02 * m.a20,
+                this.a00 * m.a01 + this.a01 * m.a11 + this.a02 * m.a21,
+                this.a00 * m.a02 + this.a01 * m.a12 + this.a02 * m.a22,
+                this.a03,
+
+                this.a10 * m.a00 + this.a11 * m.a10 + this.a12 * m.a20,
+                this.a10 * m.a01 + this.a11 * m.a11 + this.a12 * m.a21,
+                this.a10 * m.a02 + this.a11 * m.a12 + this.a12 * m.a22,
+                this.a13,
+
+                this.a20 * m.a00 + this.a21 * m.a10 + this.a22 * m.a20,
+                this.a20 * m.a01 + this.a21 * m.a11 + this.a22 * m.a21,
+                this.a20 * m.a02 + this.a21 * m.a12 + this.a22 * m.a22,
+                this.a23,
+            ]);
+        }
+
+        /*
+         * return @self
+         */
+        public function copy3x3(m:RMatrix4):RMatrix4 {
+            a00 = m.a00; a01 = m.a01; a02 = m.a02;
+            a10 = m.a10; a11 = m.a11; a12 = m.a12;
+            a20 = m.a20; a21 = m.a21; a22 = m.a22;
+            return this;
+        }
+
         public function multiplyVector3(v:RVector3):RVector3 {
             return null;
         }
@@ -174,11 +203,18 @@ package com.rails2u.geom {
              a23 = v;
         }
 
-        public function get vector3():RVector3 {
-            return new RVector3(a03, a13, a23);
+        public function vector3():RVector3 {
+            return transformVector3(new RVector3(tx, ty, tz));
+
+            //var m:RMatrix4 = new RMatrix4();
+            //m.tx = tx;
+            //m.ty = ty;
+            //m.tz = tz;
+            //var m2:RMatrix4 = multiply(m);
+            //return new RVector3(m2.tx, m2.ty, m2.tz);
         }
 
-        public function tranformVector3(v:RVector3):RVector3 {
+        public function transformVector3(v:RVector3):RVector3 {
             var vx:Number = v.x;
             var vy:Number = v.y;
             var vz:Number = v.z;
@@ -192,6 +228,24 @@ package com.rails2u.geom {
             //    v.x * a10 + v.y * a11 + v.z * a12 + a13,
             //    v.x * a20 + v.y * a21 + v.z * a22 + a23
             //);
+        }
+
+        public function transformXYZ(x:Number, y:Number, z:Number):Array {
+            var vx:Number = x;
+            var vy:Number = y;
+            var vz:Number = z;
+            x = vx * a00 + vy * a01 + vz * a02;
+            y = vx * a10 + vy * a11 + vz * a12;
+            z = vx * a20 + vy * a21 + vz * a22;
+            return [x, y, z];
+        }
+
+        public function transformXY(x:Number, y:Number, vz:Number):Array {
+            var vx:Number = x;
+            var vy:Number = y;
+            x = vx * a00 + vy * a01 + vz * a02;
+            y = vx * a10 + vy * a11 + vz * a12;
+            return [x, y];
         }
 
         public function rotateX(rad:Number):RMatrix4 {
