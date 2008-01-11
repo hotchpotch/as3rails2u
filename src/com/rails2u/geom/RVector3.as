@@ -78,6 +78,15 @@ package com.rails2u.geom {
             return degree(v) * 180/Math.PI;
         }
 
+        // not test..
+        public function matrix4():RMatrix4 {
+            var m:RMatrix4 = new RMatrix4();
+            m.tx = x;
+            m.ty = y;
+            m.tz = z;
+            return m;
+        }
+
         public function toString():String {
             return 'RVector3[x:' + x + ', y:' + y + ', z:' + z + ']';
         }

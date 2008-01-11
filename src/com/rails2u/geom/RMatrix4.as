@@ -79,6 +79,16 @@ package com.rails2u.geom {
             ]);
         }
 
+        /*
+        public function scalerVector3(v:RVector3):RMatrix4 {
+            var m:RMatrix4 = new RMatrix4();
+            m.a00 = v.x;
+            m.a11 = v.y;
+            m.a22 = v.z;
+            return clone().multiply(m);
+        }
+        */
+
         public function multiply(m:RMatrix4):RMatrix4 {
             return new RMatrix4([
                 this.a00 * m.a00 + this.a01 * m.a10 + this.a02 * m.a20,
@@ -127,8 +137,12 @@ package com.rails2u.geom {
             return this;
         }
 
-        public function multiplyVector3(v:RVector3):RVector3 {
-            return null;
+        public function multiplyVector3(v:RVector3):RMatrix4 {
+            return multiply(v.matrix4());
+        }
+
+        public function concatVector3(v:RVector3):RMatrix4 {
+            return concat(v.matrix4());
         }
 
         public function concat(m:RMatrix4):RMatrix4 {
