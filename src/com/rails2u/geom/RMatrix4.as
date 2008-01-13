@@ -1,5 +1,6 @@
 package com.rails2u.geom {
     import com.rails2u.utils.ObjectUtil;
+    import flash.geom.Matrix;
 
     public class RMatrix4 {
         public var a00:Number = 1, a01:Number = 0, a02:Number = 0, a03:Number = 0;
@@ -288,15 +289,24 @@ package com.rails2u.geom {
 
         public function scale(fx:Number, fy:Number = NaN, fz:Number = NaN):RMatrix4 {
             if (isNaN(fy)) fy = fz = fx;
-            var m:RMatrix4 = identity();
-            m.a00 = fx;
-            m.a11 = fy;
-            m.a22 = fz;
-            return concat(m);
+
+            return scaleX(fx).scaleY(fy).scaleZ(fz);
         }
 
         public function toString():String {
-            return 'RMatrix4: ' + ObjectUtil.inspect([[a00, a01, a02, a03], [a10, a11, a12, a13],[a20, a21, a22, a23]]);
+            return "RMatrix4: [\n" + 
+            "[" + [a00,a01,a02,a03].join(", ") + "]\n" +
+            "[" + [a10,a11,a12,a13].join(", ") + "]\n" +
+            "[" + [a02,a21,a22,a23].join(", ") + "]]";
+        }
+
+        public function flMatrix():Matrix {
+            //return new Matrix(values[0][0], values[0][1], values[1][0],
+            //                  values[1][1], values[3][0], values[3][1]); 
+            //return new Matrix(a00, a01, tx,
+            //                  a10, a11, ty);
+            return new Matrix(a00, a01, a10,
+                              a11, 0, 0);
         }
 
         public static function scaleX(factor:Number):RMatrix4 {

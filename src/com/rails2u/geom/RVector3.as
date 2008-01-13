@@ -23,6 +23,13 @@ package com.rails2u.geom {
             return new RVector3(x + v.x, y + v.y, z + v.z);
         }
 
+        public function concat(v:RVector3):RVector3 {
+            x += v.x;
+            y += v.y;
+            z += v.z;
+            return this;
+        }
+
         public function subtract(v:RVector3):RVector3 {
             return new RVector3(x - v.x, y - v.y, z - v.z);
         }
