@@ -15,7 +15,7 @@ package com.rails2u.chain {
 
         protected override function execute():void {
             target.addEventListener(completeEventName, completeHandler);
-            executeFunction.call(target);
+            executeFunction.call(null, this, target);
         }
 
         protected function completeHandler(e:Event):void {

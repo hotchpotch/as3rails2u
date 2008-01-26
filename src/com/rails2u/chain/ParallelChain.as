@@ -1,12 +1,13 @@
 package com.rails2u.chain {
     import flash.events.Event;
+    import flash.utils.Dictionary;
     public class ParallelChain extends Chain {
-        /*
-         * 実装は Chain#addCallback を追加してやるべき？
-         * この実装では一階層目のチェインだけで終わってしまう？
-         */
-        protected var _chainCounter:uint = 0;
+        protected var finishedChains:Array = [];
         protected var _chains:Array = [];
+
+        public function ParallelChain(chains:Array = null) {
+            if (chains) addParallelChains(chains);
+        }
 
         public function addParallelChain(c:Chain):ParallelChain {
             c.addEventListener(Event.COMPLETE, completeHandler);
@@ -28,12 +29,23 @@ package com.rails2u.chain {
         }
 
         protected function completeHandler(e:Event):void {
-            e.target.removeEventListener(Event.COMPLETE, completeHandler);
-            _chainCounter++;
-            if (_chains.length <= _chainCounter) {
+            // e.target.removeEventListener(Event.COMPLETE, completeHandler);
+            if (finishedChains.indexOf(e.target) == -1)
+                finishedChains.push(Chain(e.target));
+
+            results = getSortedResults();
+            if (_chains.length <= finishedChains.length) {
                 finish();
                 next();
             }
+        }
+
+        protected function getSortedResults():Array {
+            var res:Array = [];
+            for each(var c:Chain in _chains) {
+                if (finishedChains.indexOf(c) != -1) res.push(c.results);
+            }
+            return res;
         }
     }
 }
