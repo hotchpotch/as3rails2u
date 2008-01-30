@@ -29,5 +29,25 @@ package com.rails2u.utils {
                 return callJS(bindName + cmd);
             };
         }
+
+        public static function buildQueryString(hash:Object):String {
+            var res:Array = [];
+            for (var key:String in hash) {
+                res.push(encodeURIComponent(key) + '=' + encodeURIComponent(hash[key]));
+            }
+            return res.join('&');
+        }
+
+        public static function restoreQueryString(str:String):Object {
+            var hash:Object = {};
+            var res:Array = str.replace(/^#/, '').split('&');
+            for each(var s:String in res) {
+                if (s.indexOf('=') > 0 && s.length >= 2) {
+                    var keyval:Array = s.split('=', 2);
+                    hash[keyval[0]] = keyval[1];
+                }
+            }
+            return hash;
+        }
     }
 }

@@ -33,6 +33,10 @@ package com.rails2u.utils
             (uint(Math.random() * (bMax - bMin)) + bMin);
         }
 
+        public static function gray(col:uint):uint {
+            return col << 16 | col << 8 | col;
+        }
+
         public static function sinArray(start:int = 255, end:int = 0, cycle:uint = 90):Array {
             var f:Function = sinGenerator(start, end, cycle);
             var a:Array = [];

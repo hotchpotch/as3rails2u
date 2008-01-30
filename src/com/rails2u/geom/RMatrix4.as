@@ -27,17 +27,17 @@ package com.rails2u.geom {
 
         public static function translation(tx:Number = 0, ty:Number = 0, tz:Number = 0):RMatrix4 {
             return new RMatrix4([
-                1, 0, 0, tx,
-                0, 1, 0, ty,
-                0, 0, 1, tz
-            ]);
-       }
+                    1, 0, 0, tx,
+                    0, 1, 0, ty,
+                    0, 0, 1, tz
+                    ]);
+        }
 
         public function clone():RMatrix4 {
             return new RMatrix4([
-                a00, a01, a02, a03,
-                a10, a11, a12, a13,
-                a20, a21, a22, a23
+                    a00, a01, a02, a03,
+                    a10, a11, a12, a13,
+                    a20, a21, a22, a23
             ]);
         }
 
@@ -138,12 +138,34 @@ package com.rails2u.geom {
             return this;
         }
 
+        public function copy(m:RMatrix4):RMatrix4 {
+            a00 = m.a00; a01 = m.a01; a02 = m.a02; a03 = m.a03;
+            a10 = m.a10; a11 = m.a11; a12 = m.a12; a13 = m.a13;
+            a20 = m.a20; a21 = m.a21; a22 = m.a22; a23 = m.a23;
+            return this;
+        }
+
+        public function clear():RMatrix4 {
+            a00 = 1; a01 = 0; a02 = 0; a03 = 0;
+            a10 = 0; a11 = 1; a12 = 0; a13 = 0;
+            a20 = 0; a21 = 0; a22 = 1; a23 = 0;
+            return this;
+        }
+
         public function multiplyVector3(v:RVector3):RMatrix4 {
-            return multiply(v.matrix4());
+            return multiply(v.matrix());
         }
 
         public function concatVector3(v:RVector3):RMatrix4 {
-            return concat(v.matrix4());
+            return concat(v.matrix());
+        }
+
+        public function toArray():Array {
+            return [
+                a00, a01,a02, a03,
+                a10, a11,a12, a13,
+                a20, a21,a22, a23
+            ];
         }
 
         public function concat(m:RMatrix4):RMatrix4 {
@@ -218,7 +240,8 @@ package com.rails2u.geom {
              a23 = v;
         }
 
-        public function vector3():RVector3 {
+        public function vector():RVector3 {
+            //return transformVector3(new RVector3(tx, ty, tz));
             return transformVector3(new RVector3(tx, ty, tz));
 
             //var m:RMatrix4 = new RMatrix4();
@@ -230,12 +253,13 @@ package com.rails2u.geom {
         }
 
         public function transformVector3(v:RVector3):RVector3 {
-            var vx:Number = v.x;
-            var vy:Number = v.y;
-            var vz:Number = v.z;
-            v.x = vx * a00 + vy * a01 + vz * a02;// + a03;
-            v.y = vx * a10 + vy * a11 + vz * a12;// + a13;
-            v.z = vx * a20 + vy * a21 + vz * a22;// + a23;
+            v = v.clone();
+            var vx:Number = v.x + tx;
+            var vy:Number = v.y + ty;
+            var vz:Number = v.z + tz;
+            v.x = vx * a00 + vy * a01 + vz * a02 ;
+            v.y = vx * a10 + vy * a11 + vz * a12 ;
+            v.z = vx * a20 + vy * a21 + vz * a22 ;
             return v;
 
             //return new RVector3(
@@ -246,20 +270,20 @@ package com.rails2u.geom {
         }
 
         public function transformXYZ(x:Number, y:Number, z:Number):Array {
-            var vx:Number = x;
-            var vy:Number = y;
-            var vz:Number = z;
-            x = vx * a00 + vy * a01 + vz * a02;
-            y = vx * a10 + vy * a11 + vz * a12;
-            z = vx * a20 + vy * a21 + vz * a22;
+            var vx:Number = x + tx;
+            var vy:Number = y + ty;
+            var vz:Number = z + tz;
+            x = vx * a00 + vy * a01 + vz * a02 + a03;
+            y = vx * a10 + vy * a11 + vz * a12 + a13;
+            z = vx * a20 + vy * a21 + vz * a22 + a23;
             return [x, y, z];
         }
 
         public function transformXY(x:Number, y:Number, vz:Number):Array {
-            var vx:Number = x;
-            var vy:Number = y;
-            x = vx * a00 + vy * a01 + vz * a02;
-            y = vx * a10 + vy * a11 + vz * a12;
+            var vx:Number = x + tx;
+            var vy:Number = y + ty;
+            x = vx * a00 + vy * a01 + vz * a02 + a03;
+            y = vx * a10 + vy * a11 + vz * a12 + a13;
             return [x, y];
         }
 
@@ -355,6 +379,21 @@ package com.rails2u.geom {
                 sin , cos  , 0 , 0 , 
                 0   , 0    , 1 , 0 , 
             ]);
+        }
+
+        public static function eulerRotation(a:Number, b:Number, c:Number):RMatrix4 {
+            var ca:Number = Math.cos(a);
+            var sa:Number = Math.sin(a);
+            var cb:Number = Math.cos(b);
+            var sb:Number = Math.sin(b);
+            var cc:Number = Math.cos(c);
+            var sc:Number = Math.sin(c);
+            return new RMatrix4([ 
+                cb*cc   , sa*sb*cc  + ca*sc , -ca*sb*cc + sa*sc , 0 , 
+                - cb*sc , -sa*sb*sc + ca*cc , ca*sb*sc  + sa*cc , 0 , 
+                sb      , -sa*cb            , ca*cb             , 0
+            ]);
+
         }
     }
 }

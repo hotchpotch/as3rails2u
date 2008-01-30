@@ -14,6 +14,14 @@ package com.rails2u.geom {
             this.y = y;
         }
 
+        public static function newObj2(p1:Object, p2:Object):RVector {
+            return new RVector(p2.x - p1.x, p2.y - p1.y);
+        }
+
+        public static function newObj(p1:Object):RVector {
+            return new RVector(p1.x, p1.y);
+        }
+
         public function clone():RVector {
             return new RVector(x, y);
         }

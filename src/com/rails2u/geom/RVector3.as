@@ -1,5 +1,6 @@
 package com.rails2u.geom {
     import flash.geom.Point;
+    import flash.utils.Dictionary;
     public class RVector3 {
         public static const ZERO:RVector3 = new RVector3(0, 0, 0);
 
@@ -7,12 +8,13 @@ package com.rails2u.geom {
         public var y:Number = 0;
         public var z:Number = 0;
 
-        public var stash:Object;
+        public var stash:Dictionary;
 
         public function RVector3(x:Number = 0, y:Number = 0, z:Number = 0) {
             this.x = x;
             this.y = y;
             this.z = z;
+            this.stash = new Dictionary();
         }
 
         public function clone():RVector3 {
@@ -67,6 +69,10 @@ package com.rails2u.geom {
             return subtract(v).length;
         }
 
+        public function vector2():RVector {
+            return new RVector(x, y);
+        }
+
         public function degree(v:RVector3):Number {
             /*
             var n0:RVector3 = normalize();
@@ -86,7 +92,7 @@ package com.rails2u.geom {
         }
 
         // not test..
-        public function matrix4():RMatrix4 {
+        public function matrix():RMatrix4 {
             var m:RMatrix4 = new RMatrix4();
             m.tx = x;
             m.ty = y;
