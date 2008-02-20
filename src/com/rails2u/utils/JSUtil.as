@@ -1,7 +1,21 @@
 package com.rails2u.utils {
     import flash.external.ExternalInterface;
+    import flash.utils.describeType;
 
     public class JSUtil {
+        public static function attachCallbacks(target:*):void {
+            if (!ExternalInterface.available) 
+                return;
+
+            var res:XMLList = describeType(target).method.
+                (String(attribute('uri')) == js_callback.uri);
+
+            for each (var n:* in res) {
+                var method:String = n.@name.toString();
+                ExternalInterface.addCallback(method, target.js_callback::[method]);
+            }
+        }
+
         public static function getObjectID():String {
             return ExternalInterface.objectID;
         }

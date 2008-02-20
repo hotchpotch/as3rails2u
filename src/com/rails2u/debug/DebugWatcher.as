@@ -2,6 +2,7 @@ package com.rails2u.debug {
     import flash.events.IEventDispatcher;
     import com.rails2u.utils.Reflection;
     import flash.events.Event;
+    import com.rails2u.utils.ObjectUtil;
 
     public class DebugWatcher {
         public static function monitorEvents(target:IEventDispatcher, ... arg):void {
@@ -33,7 +34,7 @@ package com.rails2u.debug {
         }
 
         protected static function eventLog(e:Event):void {
-            log(e);
+            log(ObjectUtil.inspect(e));
         }
     }
 }
