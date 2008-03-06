@@ -54,7 +54,7 @@ package com.rails2u.utils {
 
         public static function restoreQueryString(str:String):Object {
             var hash:Object = {};
-            var res:Array = str.replace(/^#/, '').split('&');
+            var res:Array = str.replace(/^[#?]/, '').split('&');
             for each(var s:String in res) {
                 if (s.indexOf('=') > 0 && s.length >= 2) {
                     var keyval:Array = s.split('=', 2);

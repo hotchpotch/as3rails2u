@@ -46,6 +46,16 @@ package com.rails2u.utils
         
         protected var obj:InteractiveObject;
         protected var currentTarget:Object;
+        public var ignoreTargets:Array = [];
+        
+        private var _forceStop:Boolean = true;
+        public function get forceStop():Boolean {
+            return _forceStop;
+        }
+        public function set forceStop(forceStop:Boolean):void {
+            this._forceStop = forceStop;
+        }
+        
         private var reflection:Reflection;
         private var callableCache:Object = {};
         private var useCapture:Boolean;
@@ -67,11 +77,7 @@ package com.rails2u.utils
         }
         
         public function bindKey(type:String):void {
-            if(type == KeyboardEvent.KEY_DOWN) {
-                obj.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler, useCapture, priority, useWeakReference);
-            } else {
-                obj.addEventListener(KeyboardEvent.KEY_UP, keyUpHandler, useCapture, priority, useWeakReference);
-            }
+            obj.addEventListener(type, KeyboardEvent.KEY_DOWN == type ? keyDownHandler : keyUpHandler, useCapture, priority, useWeakReference);
         }
         
         public function destroy():void {
@@ -83,6 +89,7 @@ package com.rails2u.utils
            obj.removeEventListener(KeyboardEvent.KEY_UP, keyUpHandler, useCapture);
         }
         
+        // みじかくできる
         protected function keyDownHandler(e:KeyboardEvent):void {
             keyHandlerDelegeter(e, key_down);
         }
@@ -90,8 +97,19 @@ package com.rails2u.utils
         protected function keyUpHandler(e:KeyboardEvent):void {
             keyHandlerDelegeter(e, key_up);
         }
+
+        protected function isIgnore(o:*):Boolean {
+            if (ignoreTargets.length) {
+                for each(var klass:Class in ignoreTargets) {
+                    if (o is klass) return true;
+                }
+            }
+            return false;
+        }
         
         protected function keyHandlerDelegeter(e:KeyboardEvent, ns:Namespace):void {
+            if (isIgnore(e.target)) return;
+
             if (!(e.target == this.currentTarget || e.target == this.obj)) {
                 if (e.target.stage && this.obj == e.target.stage) {
                     // ...
@@ -124,7 +142,7 @@ package com.rails2u.utils
                 }
             } else if(methodName == 'after') {
                 // default after call stopPropagation because always looping event...
-                e.stopPropagation();
+                if (forceStop) e.stopPropagation();
             }
         }
         

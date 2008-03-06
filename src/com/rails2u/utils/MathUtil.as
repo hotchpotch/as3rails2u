@@ -24,6 +24,10 @@ package com.rails2u.utils
             return (Math.round(Math.random()) == 1) ? true : false;
         }
 
+        public static function minMax(val:Number, min:Number, max:Number):Number {
+            return Math.min(max, Math.max(min, val));
+        }
+
         /*
          * randomPickup(1,2,3,4); // return value is 1 or 2 or 3 or 4
          */

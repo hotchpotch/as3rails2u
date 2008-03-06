@@ -58,6 +58,7 @@ package com.rails2u.typofy {
             super();
             textField = new TextField;
             textField.selectable = false;
+            textField.embedFonts = typofy.embedFonts;
             this.addChild(textField);
             this.boundaries = boundaries;
 
