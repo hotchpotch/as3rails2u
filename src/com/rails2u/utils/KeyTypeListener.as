@@ -77,7 +77,7 @@ package com.rails2u.utils
         }
         
         public function bindKey(type:String):void {
-            obj.addEventListener(type, KeyboardEvent.KEY_DOWN == type ? keyDownHandler : keyUpHandler, useCapture, priority, useWeakReference);
+            obj.addEventListener(type, keyHandler, useCapture, priority, useWeakReference);
         }
         
         public function destroy():void {
@@ -85,19 +85,10 @@ package com.rails2u.utils
         }
         
         internal function destroyImpl():void {
-           obj.removeEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler, useCapture);
-           obj.removeEventListener(KeyboardEvent.KEY_UP, keyUpHandler, useCapture);
+           obj.removeEventListener(KeyboardEvent.KEY_DOWN, keyHandler, useCapture);
+           obj.removeEventListener(KeyboardEvent.KEY_UP, keyHandler, useCapture);
         }
         
-        // みじかくできる
-        protected function keyDownHandler(e:KeyboardEvent):void {
-            keyHandlerDelegeter(e, key_down);
-        }
-        
-        protected function keyUpHandler(e:KeyboardEvent):void {
-            keyHandlerDelegeter(e, key_up);
-        }
-
         protected function isIgnore(o:*):Boolean {
             if (ignoreTargets.length) {
                 for each(var klass:Class in ignoreTargets) {
@@ -107,8 +98,10 @@ package com.rails2u.utils
             return false;
         }
         
-        protected function keyHandlerDelegeter(e:KeyboardEvent, ns:Namespace):void {
+        protected function  keyHandler(e:KeyboardEvent):void {
             if (isIgnore(e.target)) return;
+
+            var ns:Namespace = e.type == KeyboardEvent.KEY_DOWN ? key_down : key_up;
 
             if (!(e.target == this.currentTarget || e.target == this.obj)) {
                 if (e.target.stage && this.obj == e.target.stage) {
