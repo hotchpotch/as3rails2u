@@ -33,7 +33,7 @@ package com.rails2u.utils {
                 cmd = "(function() {" + cmd + ".apply(null, arguments);})";
                 return ExternalInterface.call.apply(null, [cmd].concat(args));
             } else {
-                cmd = "(function() {" + cmd + ";})";
+                cmd = "(function() {" + cmd + ".call(null);})";
                 return ExternalInterface.call(cmd);
             }
         }
@@ -42,6 +42,12 @@ package com.rails2u.utils {
             return function(cmd:String):* {
                 return callJS(bindName + cmd);
             };
+        }
+
+        public static function loadJS(src:String):void {
+            var cmd:String = 'var s=document.createElement("script");s.charset="UTF-8";s.src="' + src + '";document.body.appendChild(s);';
+            cmd = "(function() {" + cmd + "})";
+            ExternalInterface.call(cmd);
         }
 
         public static function buildQueryString(hash:Object):String {
