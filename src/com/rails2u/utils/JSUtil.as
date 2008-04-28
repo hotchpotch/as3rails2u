@@ -1,6 +1,7 @@
 package com.rails2u.utils {
     import flash.external.ExternalInterface;
     import flash.utils.describeType;
+    import com.rails2u.bridge.JSProxy;
 
     public class JSUtil {
         public static function attachCallbacks(target:*):void {
@@ -20,9 +21,9 @@ package com.rails2u.utils {
             return ExternalInterface.objectID;
         }
 
-        public static function selfCallJS(cmd:String):* {
+        public static function selfCallJS(cmd:String, ...args):* {
             cmd = "return document.getElementById('" + getObjectID() + "')." + cmd;
-            return callJS(cmd);
+            return callJS.apply(null, [cmd].concat(args));
         }
 
         public static function callJS(cmd:String, ...args):* {

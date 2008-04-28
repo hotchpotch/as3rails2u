@@ -1,0 +1,83 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta http-equiv="Content-Script-Type" content="text/javascript">
+    <title>JSInstance Test</title>
+    <script language="JavaScript" src="../vendor/swfobject2.js"></script>
+    <script language="JavaScript" src="TestUtils.js"></script>
+    <script>
+    </script>
+    <style>
+        #test1 {
+            position: absolute;
+        }
+
+        .testTemplate {
+            position: absolute;
+            top:100px;
+            left:100px;
+        }
+
+        ul {
+            font-size: 80%;
+        }
+    </style>
+  </head>
+  <body>
+      <div id="test1" style="top:100px; height:0px;left:100px;width:0px;"></div>
+      <h1>JSInstance Test</h1>
+      <div id="result"></div>
+      <div id="swf">swf</div>
+  </body>
+</html>
+<script>
+//*
+if(typeof(console) == 'undefined') {
+    console = {};
+    console.log = function() {
+       try {
+           res = [];
+           for(var i=0;i < arguments.length; i++)
+               res.push(arguments[i].toString());
+           if (window.opera) {
+               opera.postError(res.join(', '));
+           } else {
+               external.consolelog(res.join(', '));
+           }
+       } catch(e) {
+       }
+    };
+}
+log = function() {
+    if (navigator.userAgent.indexOf('Safari') >= 0) {
+        var res = [];
+        for(var i=0;i < arguments.length; i++)
+            res.push(arguments[i].toString());
+        console.log(res.join(', '));
+    } else {
+        console.log.apply(console.log, arguments);
+    }
+};
+//*/
+
+window.onload = function() {
+  var params = {
+    bgcolor: '#FFFFFF',
+    allowScriptAccess: 'always'
+  };
+  swfobject.embedSWF("JSInstanceTest.swf?" + (new Date()).getTime(), "swf", "1", "1", '9.0.0', null, null, params, {
+    id: 'swf1',
+    name: 'swf1'
+  });
+
+  window.swf = swfobject.getObjectById('swf1');
+  swf.loadComplete = function() {
+  swf.addEventListener('test', function() {
+      log('ok');
+  });
+    ok(true, 'load complete');
+    ok(swf.value, 'set value');
+  };
+}
+</script>
